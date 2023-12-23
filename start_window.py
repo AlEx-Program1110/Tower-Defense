@@ -94,20 +94,36 @@ def draw_menu(mouse_x=-1, mouse_y=-1):
     screensaver_group.draw(screen)
 
     # draw button
+    button = pygame.Surface((150, 75))  # the size rect
+    button.set_alpha(150)  # alpha level
+    button.fill((62, 50, 168))  # this fills the entire surface
+    screen.blit(button, (size_menu[0] // 2 - 75, 10))
+
+    text_game_go1 = pygame.font.Font(None, 34)
+    text_game_go = text_game_go1.render('Продолжить', 1, 'black')
+
+    screen.blit(text_game_go, (size_menu[0] // 2 - 75, 30))
+    if mouse_x != -1 and mouse_y != -1:
+        if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 10 <= mouse_y <= 85:
+            return 1
+        return 0
 
 
 def menu():
     runnig = True
     Screensaver()
     draw_menu()
+    data = 0
     while runnig:  # boss while
         # события while
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 runnig = False
                 exit(0)
-            if True:
-                draw_menu()
+            if pygame.mouse.get_pressed()[0]:
+                data = draw_menu(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1])
+                if data == 1:
+                    runnig = False
         clock.tick(FPS)
         pygame.display.flip()
 
@@ -117,7 +133,15 @@ def level_window():
 
 
 def play_game():
-    pass
+    runnig = True
+    while runnig:  # boss while
+        # события while
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                runnig = False
+                exit(0)
+        clock.tick(FPS)
+        pygame.display.flip()
 
 
 def run():
