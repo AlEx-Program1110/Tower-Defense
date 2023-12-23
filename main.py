@@ -1,8 +1,8 @@
-import mechanics
+from start_window import run
 
 
 def main() -> None:
-    return
+    run()
 
 
 if __name__ == "__main__":
