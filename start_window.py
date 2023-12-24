@@ -5,7 +5,7 @@ import pygame
 
 # variables
 width_menu, height_menu = 686, 386  # size window menu
-width_game, height_game = 600, 500
+width_game, height_game = 600, 500  # size window game
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
@@ -89,23 +89,48 @@ def draw_game():
     pass
 
 
-def draw_menu(mouse_x=-1, mouse_y=-1):
+def draw_button(mouse_x, mouse_y, x, y, text):
+    # size_menu[0] // 2 - 75, 10, 'Продолжить'
+    # size_menu[0] // 2 - 75, 95, 'Level'
+    button_game = pygame.Surface((150, 75))  # the size rect
+    if x <= mouse_x <= x + 150 and y <= mouse_y <= y + 75:
+        button_game.set_alpha(245)  # alpha
+    else:
+        button_game.set_alpha(150)  # alpha
+    button_game.fill((62, 50, 168))  # this fills the entire surface
+    screen.blit(button_game, (x, y))
+    pygame.draw.rect(screen, 'black', (x, y, 150, 75), 1)
+    # text
+    text_game_go1 = pygame.font.Font(None, 30)
+    text_game_go = text_game_go1.render(text, 1, 'black')
+    screen.blit(text_game_go, (x, y + 20))
+
+
+def draw_menu(mouse_x=-1, mouse_y=-1, down=0):
     screen.fill(pygame.Color('white'))
     screensaver_group.draw(screen)
 
-    # draw button
-    button = pygame.Surface((150, 75))  # the size rect
-    button.set_alpha(150)  # alpha level
-    button.fill((62, 50, 168))  # this fills the entire surface
-    screen.blit(button, (size_menu[0] // 2 - 75, 10))
+    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 55, 'Продолжить')
+    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 140, 'Level')
+    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 225, 'Да')
+    # button_rules = pygame.Surface((150, 75))  # the size rect
+    # if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 95 <= mouse_y <= 95 + 75:
+    #     button_rules.set_alpha(245)  # alpha
+    # else:
+    #     button_rules.set_alpha(150)  # alpha
+    # button_rules.fill((62, 50, 168))  # this fills the entire surface
+    # screen.blit(button_rules, (size_menu[0] // 2 - 75, 95))
+    # pygame.draw.rect(screen, 'black', (size_menu[0] // 2 - 75, 95, 150, 75), 1)
+    # # text
+    # text_rules1 = pygame.font.Font(None, 30)
+    # text_rules = text_rules1.render('Level', 1, 'black')
+    # screen.blit(text_rules, (size_menu[0] // 2 - 75, 30 + 70))
 
-    text_game_go1 = pygame.font.Font(None, 34)
-    text_game_go = text_game_go1.render('Продолжить', 1, 'black')
-
-    screen.blit(text_game_go, (size_menu[0] // 2 - 75, 30))
-    if mouse_x != -1 and mouse_y != -1:
+    if down == 1:
         if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 10 <= mouse_y <= 85:
             return 1
+        if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 95 <= mouse_y <= 95 + 75:
+            return 2
         return 0
 
 
@@ -121,9 +146,10 @@ def menu():
                 runnig = False
                 exit(0)
             if pygame.mouse.get_pressed()[0]:
-                data = draw_menu(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1])
+                data = draw_menu(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1], down=1)
                 if data == 1:
                     runnig = False
+        draw_menu(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1])
         clock.tick(FPS)
         pygame.display.flip()
 
