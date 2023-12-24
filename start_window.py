@@ -85,13 +85,16 @@ def load_level(filename):
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 
-def draw_game():
-    pass
+def draw_level():
+    screen.fill(pygame.Color('white'))
+
+
+def draw_rules():
+    screen.fill(pygame.Color('white'))
 
 
 def draw_button(mouse_x, mouse_y, x, y, text):
-    # size_menu[0] // 2 - 75, 10, 'Продолжить'
-    # size_menu[0] // 2 - 75, 95, 'Level'
+    color = 'black'
     button_game = pygame.Surface((150, 75))  # the size rect
     if x <= mouse_x <= x + 150 and y <= mouse_y <= y + 75:
         button_game.set_alpha(245)  # alpha
@@ -99,38 +102,33 @@ def draw_button(mouse_x, mouse_y, x, y, text):
         button_game.set_alpha(150)  # alpha
     button_game.fill((62, 50, 168))  # this fills the entire surface
     screen.blit(button_game, (x, y))
-    pygame.draw.rect(screen, 'black', (x, y, 150, 75), 1)
+    pygame.draw.rect(screen, color, (x, y, 150, 75), 1)
     # text
-    text_game_go1 = pygame.font.Font(None, 30)
-    text_game_go = text_game_go1.render(text, 1, 'black')
-    screen.blit(text_game_go, (x, y + 20))
+    number_y = 0
+    for elem in text.split('\n'):
+        text_game_go1 = pygame.font.Font(None, 30)
+        text_game_go = text_game_go1.render(elem, 1, 'black')
+        screen.blit(text_game_go, (x + 5, y + 5 + number_y))
+        number_y += 30
 
 
 def draw_menu(mouse_x=-1, mouse_y=-1, down=0):
     screen.fill(pygame.Color('white'))
     screensaver_group.draw(screen)
 
-    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 55, 'Продолжить')
-    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 140, 'Level')
-    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 225, 'Да')
-    # button_rules = pygame.Surface((150, 75))  # the size rect
-    # if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 95 <= mouse_y <= 95 + 75:
-    #     button_rules.set_alpha(245)  # alpha
-    # else:
-    #     button_rules.set_alpha(150)  # alpha
-    # button_rules.fill((62, 50, 168))  # this fills the entire surface
-    # screen.blit(button_rules, (size_menu[0] // 2 - 75, 95))
-    # pygame.draw.rect(screen, 'black', (size_menu[0] // 2 - 75, 95, 150, 75), 1)
-    # # text
-    # text_rules1 = pygame.font.Font(None, 30)
-    # text_rules = text_rules1.render('Level', 1, 'black')
-    # screen.blit(text_rules, (size_menu[0] // 2 - 75, 30 + 70))
-
+    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 55, """Продолжить\nигру""")
+    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 140, 'Выбор\nLevel')
+    draw_button(mouse_x, mouse_y, size_menu[0] // 2 - 75, 225, 'Правила')
     if down == 1:
-        if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 10 <= mouse_y <= 85:
+        if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 55 <= mouse_y <= 130:
+            print(1)
             return 1
-        if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 95 <= mouse_y <= 95 + 75:
+        if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 140 <= mouse_y <= 215:
+            print(2)
             return 2
+        if size_menu[0] // 2 - 75 <= mouse_x <= size_menu[0] // 2 + 75 and 225 <= mouse_y <= 300:
+            print(3)
+            return 3
         return 0
 
 
@@ -149,12 +147,42 @@ def menu():
                 data = draw_menu(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1], down=1)
                 if data == 1:
                     runnig = False
+                elif data == 2:
+                    level_window()
+                elif data == 3:
+                    rules_window()
         draw_menu(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1])
         clock.tick(FPS)
         pygame.display.flip()
 
 
 def level_window():
+    runnig = True
+    while runnig:  # boss while
+        # события while
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                runnig = False
+                exit(0)
+        draw_level()
+        clock.tick(FPS)
+        pygame.display.flip()
+
+
+def rules_window():
+    runnig = True
+    while runnig:  # boss while
+        # события while
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                runnig = False
+                exit(0)
+        draw_rules()
+        clock.tick(FPS)
+        pygame.display.flip()
+
+
+def draw_game():
     pass
 
 
@@ -165,7 +193,7 @@ def play_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 runnig = False
-                exit(0)
+                return 0
         clock.tick(FPS)
         pygame.display.flip()
 
