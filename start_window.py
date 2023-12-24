@@ -85,8 +85,37 @@ def load_level(filename):
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 
-def draw_level():
-    screen.fill(pygame.Color('white'))
+def draw_button_level(mouse_x, mouse_y, x, y, text):
+    color = 'black'
+    data_mouse = 0
+    button_game = pygame.Surface((75, 75))  # the size rect
+    if x <= mouse_x <= x + 75 and y <= mouse_y <= y + 75:
+        button_game.set_alpha(245)  # alpha
+        data_mouse = 1
+    else:
+        button_game.set_alpha(150)  # alpha
+    button_game.fill((62, 50, 168))  # this fills the entire surface
+    screen.blit(button_game, (x, y))
+    pygame.draw.rect(screen, color, (x, y, 75, 75), 1)
+    # text
+    text_game_go1 = pygame.font.Font(None, 30)
+    text_game_go = text_game_go1.render(text, 1, 'black')
+    screen.blit(text_game_go, (x, y))
+    return data_mouse
+
+
+def draw_level(mouse_x=-1, mouse_y=-1, down=0):
+    fon = pygame.transform.scale(load_image('files_for_game\\fon.jpg'), (width_menu, height_menu))
+    screen.blit(fon, (0, 0))
+    button_level = 0
+    for number in range(0, 5):
+        if draw_button_level(mouse_x, mouse_y, number * 75 + 10 * number + 140, 100, str(number + 1)):
+            button_level = number + 1
+    for number in range(0, 5):
+        if draw_button_level(mouse_x, mouse_y, number * 75 + 10 * number + 140, 185, str(number + 6)):
+            button_level = number + 6
+    if down == 1:
+        return button_level
 
 
 def draw_rules():
@@ -178,7 +207,11 @@ def level_window():
             if event.type == pygame.QUIT:
                 runnig = False
                 exit(0)
-        draw_level()
+            if pygame.mouse.get_pressed()[0]:
+                data = draw_level(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1], down=1)
+                if data:
+                    print(data)
+        draw_level(mouse_x=pygame.mouse.get_pos()[0], mouse_y=pygame.mouse.get_pos()[1])
         clock.tick(FPS)
         pygame.display.flip()
 
