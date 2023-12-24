@@ -28,16 +28,6 @@ class Camera:
         self.dx = 0
         self.dy = 0
 
-    # сдвинуть объект obj на смещение камеры
-    def apply(self, obj):
-        obj.rect.x += self.dx
-        obj.rect.y += self.dy
-
-    # позиционировать камеру на объекте target
-    def update(self, target):
-        self.dx = -(target.rect.x + target.rect.w // 2 - width_game // 2)
-        self.dy = -(target.rect.y + target.rect.h // 2 - height_game // 2)
-
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
