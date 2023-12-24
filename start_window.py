@@ -90,7 +90,21 @@ def draw_level():
 
 
 def draw_rules():
-    screen.fill(pygame.Color('white'))
+    intro_text = ''
+    with open('data\\files_for_game\\rules.txt', mode='r', encoding='utf-8') as file:
+        intro_text = file.read().split('\n')
+    fon = pygame.transform.scale(load_image('files_for_game\\fon.jpg'), (width_menu, height_menu))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('black'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
 
 
 def draw_button(mouse_x, mouse_y, x, y, text):
@@ -171,13 +185,17 @@ def level_window():
 
 def rules_window():
     runnig = True
+    draw_rules()
     while runnig:  # boss while
         # события while
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 runnig = False
                 exit(0)
-        draw_rules()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    runnig = False
+                    return 0
         clock.tick(FPS)
         pygame.display.flip()
 
