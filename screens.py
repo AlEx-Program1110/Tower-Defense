@@ -45,20 +45,23 @@ class Screensaver(pygame.sprite.Sprite):
 # func
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
+
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
+        raise SystemExit
+
     image = pygame.image.load(fullname)
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
+    if colorkey is None:
         try:
             image = image.convert_alpha()
         except Exception:
             pass
+    else:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+
     return image
 
 
@@ -80,10 +83,10 @@ def draw_button_level(mouse_x, mouse_y, x, y, text):
     data_mouse = 0
     button_game = pygame.Surface((75, 75))  # the size rect
     if x <= mouse_x <= x + 75 and y <= mouse_y <= y + 75:
-        button_game.set_alpha(245)  # alpha
+        button_game.set_alpha(255)  # alpha
         data_mouse = 1
     else:
-        button_game.set_alpha(150)  # alpha
+        button_game.set_alpha(200)  # alpha
     button_game.fill((62, 50, 168))  # this fills the entire surface
     screen.blit(button_game, (x, y))
     pygame.draw.rect(screen, color, (x, y, 75, 75), 1)
@@ -228,13 +231,12 @@ def draw_game():
 
 
 def play_game():
-    runnig = True
-    while runnig:  # boss while
+    while True:  # boss while
         # события while
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                runnig = False
-                return 0
+                return
+
         clock.tick(FPS)
         pygame.display.flip()
 
