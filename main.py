@@ -1,8 +1,8 @@
-from screens import run
+from screens import main_screen_function
 
 
 def main() -> None:
-    run()
+    main_screen_function()
 
 
 if __name__ == "__main__":
