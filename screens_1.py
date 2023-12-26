@@ -44,6 +44,7 @@ def survival_screen() -> None:
 
 def levels_menu_screen() -> None:
     global name_of_function
+    pygame.time.delay(100)
 
     while True:
         classic_event_loop()
@@ -62,7 +63,7 @@ def levels_menu_screen() -> None:
 
 
 def play_level(level_number: int) -> None:
-    print(level_number)
+    print(level_number, "E")
     while True:
         classic_event_loop()
         if name_of_function == "main_menu":
