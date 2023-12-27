@@ -47,3 +47,50 @@ class Button:
             pygame.draw.rect(self.screen, self.inactive_color, self.rect, border_radius=self.border_radius)
 
         self.screen.blit(rendered_text, rendered_text.get_rect(center=(self.x, self.y)))
+
+
+class Board:
+    # создание поля
+    def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int):
+        self.width = width
+        self.height = height
+        self.board = [[0] * width for _ in range(height)]
+        # значения по умолчанию
+        self.left = left_indent
+        self.top = top_indent
+        self.cell_size = cell_size
+
+    def get_click(self, mouse_pos):
+        cell = self.get_cell(mouse_pos)
+        self.on_click(cell)
+
+    def get_cell(self, mouse):
+        mouse = list(mouse)
+        mouse[0] = (mouse[0] - self.left) // self.cell_size
+        mouse[1] = (mouse[1] - self.top) // self.cell_size
+        if mouse[0] < 0 or mouse[0] >= self.width or mouse[1] < 0 or mouse[1] >= self.height:
+            return None
+        return tuple(mouse)
+
+    def on_click(self, x_y_data: tuple):
+        if x_y_data is None:
+            return 0
+        print(1)
+
+    # настройка внешнего вида
+    def set_view(self, left, top, cell_size):
+        self.left = left
+        self.top = top
+        self.cell_size = cell_size
+
+    def render(self, screen):
+        for y in range(self.height):
+            for x in range(self.width):
+                if self.board[y][x]:
+                    pygame.draw.rect(screen, pygame.Color('green'),
+                                     (x * self.cell_size + self.left,
+                                      y * self.cell_size + self.top,
+                                      self.cell_size, self.cell_size))
+                pygame.draw.rect(screen, (255, 255, 255), (x * self.cell_size + self.left,
+                                                           y * self.cell_size + self.top,
+                                                           self.cell_size, self.cell_size), 1)
