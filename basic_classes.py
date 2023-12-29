@@ -1,4 +1,5 @@
 import pygame
+from os import path
 
 pygame.init()
 pygame.font.init()
@@ -60,6 +61,9 @@ class Board:
         self.top = top_indent
         self.cell_size = cell_size
 
+        self.grass = load_image('grass.jpg')
+        self.grass = pygame.transform.scale(self.grass, (self.cell_size, self.cell_size))
+
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         self.on_click(cell)
@@ -87,10 +91,30 @@ class Board:
         for y in range(self.height):
             for x in range(self.width):
                 if self.board[y][x] == 'G':
-                    pygame.draw.rect(screen, pygame.Color('green'),
-                                     (x * self.cell_size + self.left,
-                                      y * self.cell_size + self.top,
-                                      self.cell_size, self.cell_size))
-                pygame.draw.rect(screen, (255, 255, 255), (x * self.cell_size + self.left,
-                                                           y * self.cell_size + self.top,
-                                                           self.cell_size, self.cell_size), 1)
+                    screen.blit(self.grass, (x * self.cell_size + self.left,
+                                             y * self.cell_size + self.top))
+                # pygame.draw.rect(screen, (255, 255, 255), (x * self.cell_size + self.left,
+                #                                            y * self.cell_size + self.top,
+                #                                            self.cell_size, self.cell_size), 1)
+
+
+def load_image(name, colorkey=None):
+    fullname = path.join('data\\texture', name)
+
+    if not path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        raise SystemExit
+
+    image = pygame.image.load(fullname)
+
+    if colorkey is None:
+        try:
+            image = image.convert_alpha()
+        except Exception:
+            pass
+    else:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    return image
