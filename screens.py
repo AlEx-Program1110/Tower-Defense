@@ -1,7 +1,7 @@
 import pygame
 from random import randint
-from mechanics import load_image
-from basic_classes import Button
+from mechanics import load_image, read_map
+from basic_classes import Button, Board
 
 
 def main_screen_function():
@@ -64,13 +64,13 @@ def levels_menu_screen() -> None:
 
 def play_level(level_number: int) -> None:
     print(level_number, "E")
-
+    pole = read_map(f'level_{level_number}.txt', (width, height))
     while True:
         classic_event_loop()
         if name_of_function == "main_menu":
             return
-
         screen.fill((0, 0, 0))
+        pole.render(screen)
         pygame.display.flip()
 
 

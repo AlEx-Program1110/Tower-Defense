@@ -51,10 +51,10 @@ class Button:
 
 class Board:
     # создание поля
-    def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int):
+    def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int, board):
         self.width = width
         self.height = height
-        self.board = [[0] * width for _ in range(height)]
+        self.board = board
         # значения по умолчанию
         self.left = left_indent
         self.top = top_indent
@@ -86,7 +86,7 @@ class Board:
     def render(self, screen):
         for y in range(self.height):
             for x in range(self.width):
-                if self.board[y][x]:
+                if self.board[y][x] == 'G':
                     pygame.draw.rect(screen, pygame.Color('green'),
                                      (x * self.cell_size + self.left,
                                       y * self.cell_size + self.top,
