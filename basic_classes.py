@@ -64,7 +64,7 @@ class Board:
         self.grass = load_image('grass.jpg')
         self.grass = pygame.transform.scale(self.grass, (self.cell_size, self.cell_size))
         self.trails = list()
-        for i in range(2):
+        for i in range(6):
             self.trails.append(load_image(f'trail_{i + 1}.jpg'))
             self.trails[i] = pygame.transform.scale(self.trails[i], (self.cell_size, self.cell_size))
 
