@@ -63,6 +63,10 @@ class Board:
 
         self.grass = load_image('grass.jpg')
         self.grass = pygame.transform.scale(self.grass, (self.cell_size, self.cell_size))
+        self.trails = list()
+        for i in range(2):
+            self.trails.append(load_image(f'trail_{i + 1}.jpg'))
+            self.trails[i] = pygame.transform.scale(self.trails[i], (self.cell_size, self.cell_size))
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -93,6 +97,9 @@ class Board:
                 if self.board[y][x] == 'G':
                     screen.blit(self.grass, (x * self.cell_size + self.left,
                                              y * self.cell_size + self.top))
+                else:
+                    screen.blit(self.trails[int(self.board[y][x]) - 1], (x * self.cell_size + self.left,
+                                                                         y * self.cell_size + self.top))
                 # pygame.draw.rect(screen, (255, 255, 255), (x * self.cell_size + self.left,
                 #                                            y * self.cell_size + self.top,
                 #                                            self.cell_size, self.cell_size), 1)
