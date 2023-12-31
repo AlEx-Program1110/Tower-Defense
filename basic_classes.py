@@ -1,9 +1,10 @@
 import pygame
 from os import path
 
-pygame.init()
-pygame.font.init()
-COMIC_SANS_MS = pygame.font.SysFont('Comic Sans MS', 30)
+
+class Tower:
+    def __init__(self):
+        pass
 
 
 class Button:
@@ -63,6 +64,14 @@ class Board:
 
         self.grass = load_image('grass.jpg')
         self.grass = pygame.transform.scale(self.grass, (self.cell_size, self.cell_size))
+
+        self.towers_texture = {
+            'fire': [
+                pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))]}
+
+        self.plate = load_image('plate.jpg')
+        self.plate = pygame.transform.scale(self.plate, (self.cell_size, self.cell_size))
+
         self.trails = list()
         for i in range(6):
             self.trails.append(load_image(f'trail_{i + 1}.jpg'))
@@ -83,9 +92,14 @@ class Board:
     def on_click(self, x_y_data: tuple):
         if x_y_data is None:
             return 0
-        print(1)
+        print(x_y_data)
+        if self.board[x_y_data[1]][x_y_data[0]] == 'G':
+            self.board[x_y_data[1]][x_y_data[0]] = 'P'
+        elif self.board[x_y_data[1]][x_y_data[0]] == 'P':
+            self.board[x_y_data[1]][x_y_data[0]] = 'F0'
 
-    # настройка внешнего вида
+            # настройка внешнего вида
+
     def set_view(self, left, top, cell_size):
         self.left = left
         self.top = top
@@ -97,12 +111,18 @@ class Board:
                 if self.board[y][x] == 'G':
                     screen.blit(self.grass, (x * self.cell_size + self.left,
                                              y * self.cell_size + self.top))
-                else:
+                elif self.board[y][x].isdigit():
                     screen.blit(self.trails[int(self.board[y][x]) - 1], (x * self.cell_size + self.left,
                                                                          y * self.cell_size + self.top))
-                # pygame.draw.rect(screen, (255, 255, 255), (x * self.cell_size + self.left,
-                #                                            y * self.cell_size + self.top,
-                #                                            self.cell_size, self.cell_size), 1)
+                elif self.board[y][x] == 'P':
+                    screen.blit(self.plate, (x * self.cell_size + self.left,
+                                             y * self.cell_size + self.top))
+                elif self.board[y][x][0] == 'F':
+                    screen.blit(self.plate, (x * self.cell_size + self.left,
+                                             y * self.cell_size + self.top))
+                    screen.blit(self.towers_texture['fire'][int(self.board[y][x][1])],
+                                (x * self.cell_size + self.left + self.cell_size // 6,
+                                 y * self.cell_size + self.top + self.cell_size // 6))
 
 
 def load_image(name, colorkey=None):
@@ -125,3 +145,8 @@ def load_image(name, colorkey=None):
             colorkey = image.get_at((0, 0))
         image.set_colorkey(colorkey)
     return image
+
+
+pygame.init()
+pygame.font.init()
+COMIC_SANS_MS = pygame.font.SysFont('Comic Sans MS', 30)

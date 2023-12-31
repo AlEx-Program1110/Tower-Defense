@@ -66,9 +66,13 @@ def play_level(level_number: int) -> None:
     print(level_number, "E")
     pole = read_map(f'level_{level_number}.txt', (width, height))
     while True:
-        classic_event_loop()
         if name_of_function == "main_menu":
             return
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit_function()
+            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
+                pole.get_click(pygame.mouse.get_pos())
         screen.fill((0, 0, 0))
         pole.render(screen)
         pygame.display.flip()
