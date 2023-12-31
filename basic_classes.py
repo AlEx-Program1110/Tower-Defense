@@ -7,6 +7,7 @@ class Tower_fire(pygame.sprite.Sprite):
         super().__init__()
         self.image_all = image_all.copy()
         self.image = self.image_all[0]
+        self.rect = self.image.get_rect()
 
         self.x = x
         self.y = y
@@ -19,6 +20,9 @@ class Tower_fire(pygame.sprite.Sprite):
 
     def set_corner(self, corner):
         self.corner = corner
+        loc = self.image.get_rect().center  # rot_image is not defined
+        self.image = pygame.transform.rotate(self.image, corner)
+        self.image.get_rect().center = loc
 
     def set_view(self, view):
         self.view = view
@@ -120,7 +124,6 @@ class Board:
                 x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
                 y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                 image_all=self.towers_texture['fire'])
-
             # настройка внешнего вида
 
     def set_view(self, left, top, cell_size):

@@ -74,6 +74,7 @@ def play_level(level_number: int) -> None:
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 pole.get_click(pygame.mouse.get_pos())
         screen.fill((0, 0, 0))
+        clock.tick(FPS)
         pole.render(screen)
         pygame.display.flip()
 
@@ -122,6 +123,8 @@ def exit_function() -> None:
 pygame.init()
 width, height = pygame.display.Info().current_w // 2, pygame.display.Info().current_h // 2
 screen = pygame.display.set_mode((width, height))
+clock = pygame.time.Clock()
+FPS = 100
 
 main_menu_back_ground = load_image(f"screensaver\\screensaver_{randint(1, 2)}.jpg")
 main_menu_back_ground = pygame.transform.scale(main_menu_back_ground, (width, height))
