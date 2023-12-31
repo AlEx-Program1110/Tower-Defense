@@ -2,9 +2,27 @@ import pygame
 from os import path
 
 
-class Tower:
-    def __init__(self):
-        pass
+class Tower_fire(pygame.sprite.Sprite):
+    def __init__(self, x=0, y=0, image_all=[]):
+        super().__init__()
+        self.image_all = image_all.copy()
+        self.image = self.image_all[0]
+
+        self.x = x
+        self.y = y
+        self.name = 'tower_fire'
+        self.corner = 0
+        self.view = 0
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.y))
+
+    def set_corner(self, corner):
+        self.corner = corner
+
+    def set_view(self, view):
+        self.view = view
+        self.image = self.image_all[view]
 
 
 class Button:
@@ -67,7 +85,9 @@ class Board:
 
         self.towers_texture = {
             'fire': [
-                pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))]}
+                pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_fire_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_fire_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))]}
 
         self.plate = load_image('plate.jpg')
         self.plate = pygame.transform.scale(self.plate, (self.cell_size, self.cell_size))
@@ -96,7 +116,10 @@ class Board:
         if self.board[x_y_data[1]][x_y_data[0]] == 'G':
             self.board[x_y_data[1]][x_y_data[0]] = 'P'
         elif self.board[x_y_data[1]][x_y_data[0]] == 'P':
-            self.board[x_y_data[1]][x_y_data[0]] = 'F0'
+            self.board[x_y_data[1]][x_y_data[0]] = Tower_fire(
+                x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                image_all=self.towers_texture['fire'])
 
             # настройка внешнего вида
 
@@ -108,21 +131,20 @@ class Board:
     def render(self, screen):
         for y in range(self.height):
             for x in range(self.width):
-                if self.board[y][x] == 'G':
-                    screen.blit(self.grass, (x * self.cell_size + self.left,
-                                             y * self.cell_size + self.top))
-                elif self.board[y][x].isdigit():
-                    screen.blit(self.trails[int(self.board[y][x]) - 1], (x * self.cell_size + self.left,
-                                                                         y * self.cell_size + self.top))
-                elif self.board[y][x] == 'P':
+                try:
+                    if self.board[y][x] == 'G':
+                        screen.blit(self.grass, (x * self.cell_size + self.left,
+                                                 y * self.cell_size + self.top))
+                    elif self.board[y][x].isdigit():
+                        screen.blit(self.trails[int(self.board[y][x]) - 1], (x * self.cell_size + self.left,
+                                                                             y * self.cell_size + self.top))
+                    elif self.board[y][x] == 'P':
+                        screen.blit(self.plate, (x * self.cell_size + self.left,
+                                                 y * self.cell_size + self.top))
+                except Exception:
                     screen.blit(self.plate, (x * self.cell_size + self.left,
                                              y * self.cell_size + self.top))
-                elif self.board[y][x][0] == 'F':
-                    screen.blit(self.plate, (x * self.cell_size + self.left,
-                                             y * self.cell_size + self.top))
-                    screen.blit(self.towers_texture['fire'][int(self.board[y][x][1])],
-                                (x * self.cell_size + self.left + self.cell_size // 6,
-                                 y * self.cell_size + self.top + self.cell_size // 6))
+                    self.board[y][x].draw(screen)
 
 
 def load_image(name, colorkey=None):
