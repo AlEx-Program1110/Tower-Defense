@@ -93,6 +93,11 @@ class Board:
                 pygame.transform.scale(load_image('tower_fire_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
                 pygame.transform.scale(load_image('tower_fire_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))]}
 
+        self.money = 100
+
+        self.choice = 0
+        self.pos_choice = []
+
         self.plate = load_image('plate.jpg')
         self.plate = pygame.transform.scale(self.plate, (self.cell_size, self.cell_size))
 
@@ -117,19 +122,29 @@ class Board:
         if x_y_data is None:
             return 0
         print(x_y_data)
-        if self.board[x_y_data[1]][x_y_data[0]] == 'G':
-            self.board[x_y_data[1]][x_y_data[0]] = 'P'
-        elif self.board[x_y_data[1]][x_y_data[0]] == 'P':
-            self.board[x_y_data[1]][x_y_data[0]] = Tower_fire(
-                x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
-                y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
-                image_all=self.towers_texture['fire'])
-            # настройка внешнего вида
+        # self.board[x_y_data[1]][x_y_data[0]] = Tower_fire(
+        #     x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+        #     y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+        #     image_all=self.towers_texture['fire'])
+        # настройка внешнего вида
+        # self.board[x_y_data[1]][x_y_data[0]] = 'P'
+        if self.choice:
+            pass
+        else:
+            self.pos_choice = list(x_y_data)
+            if self.board[x_y_data[1]][x_y_data[0]] == 'G':
+                self.choice = 1
+            elif self.board[x_y_data[1]][x_y_data[0]] == 'P':
+                self.choice = 2
 
     def set_view(self, left, top, cell_size):
         self.left = left
         self.top = top
         self.cell_size = cell_size
+
+    def draw_interface(self, screen):
+        # pygame.draw.rect(screen, )
+        pass
 
     def render(self, screen):
         for y in range(self.height):
@@ -148,6 +163,8 @@ class Board:
                     screen.blit(self.plate, (x * self.cell_size + self.left,
                                              y * self.cell_size + self.top))
                     self.board[y][x].draw(screen)
+        rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
+        screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
 
 
 def load_image(name, colorkey=None):
