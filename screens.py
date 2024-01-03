@@ -73,6 +73,14 @@ def play_level(level_number: int) -> None:
                 exit_function()
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 pole.get_click(pygame.mouse.get_pos())
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_0:
+                    pole.set_command('0')
+                if event.key == pygame.K_1:
+                    pole.set_command('1')
+                if event.key == pygame.K_DELETE:
+                    pole.set_command('del')
+                print(1)
         screen.fill((0, 0, 0))
         clock.tick(FPS)
         pole.render(screen)

@@ -87,6 +87,14 @@ class Board:
         self.grass = load_image('grass.jpg')
         self.grass = pygame.transform.scale(self.grass, (self.cell_size, self.cell_size))
 
+        self.command_all = {
+            '1': pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 2, self.cell_size // 2)),
+            '2': '', '3': '', '4': '', '5': '', '6': '', '7': '', '8': '', '9': '',
+            '0': pygame.transform.scale(load_image('plate.jpg'), (self.cell_size // 2, self.cell_size // 2)),
+            'del': pygame.transform.scale(load_image('del.jpg'), (self.cell_size // 2, self.cell_size // 2))}
+
+        self.command = '0'
+
         self.towers_texture = {
             'fire': [
                 pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
@@ -98,8 +106,7 @@ class Board:
         self.choice = 0
         self.pos_choice = []
 
-        self.plate = load_image('plate.jpg')
-        self.plate = pygame.transform.scale(self.plate, (self.cell_size, self.cell_size))
+        self.plate = pygame.transform.scale(load_image('plate.jpg'), (self.cell_size, self.cell_size))
 
         self.trails = list()
         for i in range(6):
@@ -128,23 +135,30 @@ class Board:
         #     image_all=self.towers_texture['fire'])
         # настройка внешнего вида
         # self.board[x_y_data[1]][x_y_data[0]] = 'P'
-        if self.choice:
-            pass
+        command = self.command
+        if command == 'del':
+            try:
+                if not self.board[x_y_data[1]][x_y_data[0]].isdigit():
+                    self.board[x_y_data[1]][x_y_data[0]] = 'G'
+            except Exception:
+                self.board[x_y_data[1]][x_y_data[0]] = 'G'
         else:
-            self.pos_choice = list(x_y_data)
-            if self.board[x_y_data[1]][x_y_data[0]] == 'G':
-                self.choice = 1
+            if command == '0':
+                self.board[x_y_data[1]][x_y_data[0]] = 'P'
             elif self.board[x_y_data[1]][x_y_data[0]] == 'P':
-                self.choice = 2
+                if command == '1':
+                    self.board[x_y_data[1]][x_y_data[0]] = Tower_fire(
+                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                        image_all=self.towers_texture['fire'])
 
     def set_view(self, left, top, cell_size):
         self.left = left
         self.top = top
         self.cell_size = cell_size
 
-    def draw_interface(self, screen):
-        # pygame.draw.rect(screen, )
-        pass
+    def set_command(self, command):
+        self.command = command
 
     def render(self, screen):
         for y in range(self.height):
@@ -165,6 +179,8 @@ class Board:
                     self.board[y][x].draw(screen)
         rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
+
+        screen.blit(self.command_all[self.command], (self.left + (self.cell_size * (self.width - 2.5)), self.top))
 
 
 def load_image(name, colorkey=None):
