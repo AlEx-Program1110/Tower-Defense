@@ -91,7 +91,8 @@ class Board:
             '1': pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 2, self.cell_size // 2)),
             '2': '', '3': '', '4': '', '5': '', '6': '', '7': '', '8': '', '9': '',
             '0': pygame.transform.scale(load_image('plate.jpg'), (self.cell_size // 2, self.cell_size // 2)),
-            'del': pygame.transform.scale(load_image('del.jpg'), (self.cell_size // 2, self.cell_size // 2))}
+            'del': pygame.transform.scale(load_image('del.jpg'), (self.cell_size // 2, self.cell_size // 2)),
+            'uplevel': pygame.transform.scale(load_image('uplevel.jpg'), (self.cell_size // 2, self.cell_size // 2))}
 
         self.command = '0'
 
@@ -142,6 +143,15 @@ class Board:
                     self.board[x_y_data[1]][x_y_data[0]] = 'G'
             except Exception:
                 self.board[x_y_data[1]][x_y_data[0]] = 'G'
+        elif command == 'uplevel':
+            try:
+                if self.board[x_y_data[1]][x_y_data[0]].name:
+                    pass
+                if self.board[x_y_data[1]][x_y_data[0]].view + 1 > 2:
+                    raise Exception
+                self.board[x_y_data[1]][x_y_data[0]].set_view(self.board[x_y_data[1]][x_y_data[0]].view + 1)
+            except Exception:
+                pass
         else:
             if command == '0':
                 self.board[x_y_data[1]][x_y_data[0]] = 'P'

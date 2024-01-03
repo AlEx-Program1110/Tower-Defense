@@ -80,7 +80,8 @@ def play_level(level_number: int) -> None:
                     pole.set_command('1')
                 if event.key == pygame.K_DELETE:
                     pole.set_command('del')
-                print(1)
+                if event.key == pygame.K_UP:
+                    pole.set_command('uplevel')
         screen.fill((0, 0, 0))
         clock.tick(FPS)
         pole.render(screen)
