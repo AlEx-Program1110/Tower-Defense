@@ -63,12 +63,16 @@ def levels_menu_screen() -> None:
 
 
 def play_level(level_number: int) -> None:
+    global name_of_function
     print(level_number, "E")
     pole = read_map(f'level_{level_number}.txt', (width, height))
     while True:
         if name_of_function == "main_menu":
             return
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                name_of_function = "main_menu"
+                return
             if event.type == pygame.QUIT:
                 exit_function()
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
@@ -78,6 +82,22 @@ def play_level(level_number: int) -> None:
                     pole.set_command('0')
                 if event.key == pygame.K_1:
                     pole.set_command('1')
+                if event.key == pygame.K_2:
+                    pole.set_command('2')
+                if event.key == pygame.K_3:
+                    pole.set_command('3')
+                if event.key == pygame.K_4:
+                    pole.set_command('4')
+                if event.key == pygame.K_5:
+                    pole.set_command('5')
+                if event.key == pygame.K_6:
+                    pole.set_command('6')
+                if event.key == pygame.K_7:
+                    pole.set_command('7')
+                if event.key == pygame.K_8:
+                    pole.set_command('8')
+                if event.key == pygame.K_9:
+                    pole.set_command('9')
                 if event.key == pygame.K_DELETE:
                     pole.set_command('del')
                 if event.key == pygame.K_UP:
