@@ -57,7 +57,7 @@ def read_map(name, size):
         count_wave = int(data[0].split()[-1])
         data.pop(0)
         data_wave = {}
-        for i in range(len(data)):
+        for i in range(len(data) // 2):
             if data[0] != f'{i + 1} WAVE:':
                 raise Exception('Файл поврежден!!!')
             data.pop(0)

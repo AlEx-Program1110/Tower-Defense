@@ -2,16 +2,13 @@ import pygame
 from os import path
 
 
-# self.mobs = [Mob(x=self.path[0][0], y=self.path[0][1],
-#                  image=pygame.transform.scale(load_image('yes.jpg'), (self.cell_size, self.cell_size)),
-#                  speed=self.cell_size * 2, xp=10, path=self.path)]
-
 class Mob(pygame.sprite.Sprite):
-    def __init__(self, x=0, y=0, image='', speed=0, xp=10, path=pygame.image):
+    def __init__(self, x=0, y=0, image='', speed=0, xp=10, path=[]):
         super().__init__()
         self.image = image
         self.x = x
         self.y = y
+        print(x, y)
         self.speed = speed
         self.xp = xp
         self.path = path[1:]
@@ -154,10 +151,13 @@ class Board:
         self.texture_mobs = {'regular': pygame.transform.scale(load_image('yes.jpg'),
                                                                (self.cell_size, self.cell_size))}
         self.path = path
+        for i in range(len(self.path)):
+            elem = [int(path[i].split(' : ')[0].split(',')[0]), int(path[i].split(' : ')[0].split(',')[1]),
+                    int(path[i].split(' : ')[-1])]
+            elem[0] = elem[0] * self.cell_size + self.left
+            elem[1] = elem[1] * self.cell_size + self.top
+            self.path[i] = elem
         self.mobs = []
-        self.data_mob = {'regular': Mob(self.path[0][0], self.path[0][1],
-                                        self.texture_mobs['regular'],
-                                        self.cell_size * 2, 10, self.path)}
         self.now_wave = 1
         self.count_wave = count_wave
         self.command_all = {
@@ -170,12 +170,9 @@ class Board:
         self.money = 100
         self.choice = 0
         self.pos_choice = []
-        for i in range(len(self.path)):
-            elem = [int(path[i].split(' : ')[0].split(',')[0]), int(path[i].split(' : ')[0].split(',')[1]),
-                    int(path[i].split(' : ')[-1])]
-            elem[0] = elem[0] * self.cell_size + self.left
-            elem[1] = elem[1] * self.cell_size + self.top
-            self.path[i] = elem
+        self.tick = 0
+        self.count_mobs = 0
+        self.data_wave = data_wave
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -259,14 +256,31 @@ class Board:
             elem.draw(screen)
 
     def update(self, FPS):
+        self.tick += 1
+        if self.tick == FPS * int(self.data_wave[self.now_wave].split(': ')[-1]):
+
+            self.tick = 0
+            if int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) != self.count_mobs:
+                self.mobs.append(Mob(self.path[0][0], self.path[0][1],
+                                     self.texture_mobs['regular'],
+                                     self.cell_size * 3, 10, self.path))
+                self.count_mobs += 1
+            elif int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) == self.count_mobs:
+                if self.mobs == []:
+                    self.now_wave += 1
+                    if self.now_wave <= self.count_wave:
+                        self.count_mobs = 0
+                    else:
+                        self.now_wave -= 1
         for i in range(len(self.mobs)):
-            self.mobs[i].update(FPS)
-            print(self.mobs[i].get_x_y())
-            print((self.path[-1][0], self.path[-1][1]))
-            if self.mobs[i].get_xp() <= 0:
-                self.mobs.pop(i)
-            elif self.mobs[i].get_x_y() == [self.path[-1][0], self.path[-1][1]]:
-                self.mobs.pop(i)
+            try:
+                self.mobs[i].update(FPS)
+                if self.mobs[i].get_xp() <= 0:
+                    self.mobs.pop(i)
+                elif self.mobs[i].get_x_y() == [self.path[-1][0], self.path[-1][1]]:
+                    self.mobs.pop(i)
+            except Exception:
+                break
 
 
 def load_image(name, colorkey=None):
