@@ -47,10 +47,26 @@ def read_map(name, size):
         for y in range(height):
             pole.append(list(data[0]))
             data.pop(0)
+        if data[0].split(':')[0] != 'PATH':
+            raise Exception('Файл поврежден!!!')
+        data.pop(0)
+        path = data[0].split(';')
+        data.pop(0)
+        if data[0].split()[0] != 'COUNT' or data[0].split()[1] != 'WAVE':
+            raise Exception('Файл поврежден!!!')
+        count_wave = int(data[0].split()[-1])
+        data.pop(0)
+        data_wave = {}
+        for i in range(len(data)):
+            if data[0] != f'{i + 1} WAVE:':
+                raise Exception('Файл поврежден!!!')
+            data.pop(0)
+            data_wave[i + 1] = data[0]
+            data.pop(0)
     except Exception as text:
         print(text)
         return 0
     size_cell = min(size) // min(width, height)
     left = (size[0] - (width * size_cell)) // 2
     top = (size[1] - (height * size_cell)) // 2
-    return Board(width, height, left, top, size_cell, pole)
+    return Board(width, height, left, top, size_cell, pole, path, count_wave, data_wave)

@@ -2,6 +2,59 @@ import pygame
 from os import path
 
 
+# self.mobs = [Mob(x=self.path[0][0], y=self.path[0][1],
+#                  image=pygame.transform.scale(load_image('yes.jpg'), (self.cell_size, self.cell_size)),
+#                  speed=self.cell_size * 2, xp=10, path=self.path)]
+
+class Mob(pygame.sprite.Sprite):
+    def __init__(self, x=0, y=0, image='', speed=0, xp=10, path=pygame.image):
+        super().__init__()
+        self.image = image
+        self.x = x
+        self.y = y
+        self.speed = speed
+        self.xp = xp
+        self.path = path[1:]
+        self.direction = path[0][-1]
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.y))
+
+    def get_xp(self):
+        return self.xp
+
+    def get_x_y(self):
+        return [self.x, self.y]
+
+    def update(self, FPS):
+        if self.direction == 0:
+            return 0
+        if self.direction == 1:
+            self.x += self.speed / FPS
+            if self.x >= self.path[0][0]:
+                self.x = self.path[0][0]
+                self.direction = self.path[0][-1]
+                self.path.pop(0)
+        elif self.direction == 2:
+            self.y -= self.speed / FPS
+            if self.y <= self.path[0][1]:
+                self.y = self.path[0][1]
+                self.direction = self.path[0][-1]
+                self.path.pop(0)
+        elif self.direction == 3:
+            self.x -= self.speed / FPS
+            if self.x <= self.path[0][0]:
+                self.x = self.path[0][0]
+                self.direction = self.path[0][-1]
+                self.path.pop(0)
+        elif self.direction == 4:
+            self.y += self.speed / FPS
+            if self.y >= self.path[0][1]:
+                self.y = self.path[0][1]
+                self.direction = self.path[0][-1]
+                self.path.pop(0)
+
+
 class Tower_fire(pygame.sprite.Sprite):
     def __init__(self, x=0, y=0, image_all=[]):
         super().__init__()
@@ -14,6 +67,8 @@ class Tower_fire(pygame.sprite.Sprite):
         self.name = 'tower_fire'
         self.corner = 0
         self.view = 0
+        self.radius = 100
+        self.damage = 10
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
@@ -75,44 +130,52 @@ class Button:
 
 class Board:
     # создание поля
-    def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int, board):
+    def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int, board, path,
+                 count_wave: int, data_wave):
         self.width = width
         self.height = height
         self.board = board
-        # значения по умолчанию
         self.left = left_indent
         self.top = top_indent
         self.cell_size = cell_size
 
         self.grass = load_image('grass.jpg')
         self.grass = pygame.transform.scale(self.grass, (self.cell_size, self.cell_size))
-
+        self.plate = pygame.transform.scale(load_image('plate.jpg'), (self.cell_size, self.cell_size))
+        self.towers_texture = {
+            'fire': [
+                pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_fire_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_fire_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))]}
+        self.trails = list()
+        for i in range(6):
+            self.trails.append(load_image(f'trail_{i + 1}.jpg'))
+            self.trails[i] = pygame.transform.scale(self.trails[i], (self.cell_size, self.cell_size))
+        self.texture_mobs = {'regular': pygame.transform.scale(load_image('yes.jpg'),
+                                                               (self.cell_size, self.cell_size))}
+        self.path = path
+        self.mobs = []
+        self.data_mob = {'regular': Mob(self.path[0][0], self.path[0][1],
+                                        self.texture_mobs['regular'],
+                                        self.cell_size * 2, 10, self.path)}
+        self.now_wave = 1
+        self.count_wave = count_wave
         self.command_all = {
             '1': pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 2, self.cell_size // 2)),
             '2': '', '3': '', '4': '', '5': '', '6': '', '7': '', '8': '', '9': '',
             '0': pygame.transform.scale(load_image('plate.jpg'), (self.cell_size // 2, self.cell_size // 2)),
             'del': pygame.transform.scale(load_image('del.jpg'), (self.cell_size // 2, self.cell_size // 2)),
             'uplevel': pygame.transform.scale(load_image('uplevel.jpg'), (self.cell_size // 2, self.cell_size // 2))}
-
         self.command = '0'
-
-        self.towers_texture = {
-            'fire': [
-                pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
-                pygame.transform.scale(load_image('tower_fire_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
-                pygame.transform.scale(load_image('tower_fire_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))]}
-
         self.money = 100
-
         self.choice = 0
         self.pos_choice = []
-
-        self.plate = pygame.transform.scale(load_image('plate.jpg'), (self.cell_size, self.cell_size))
-
-        self.trails = list()
-        for i in range(6):
-            self.trails.append(load_image(f'trail_{i + 1}.jpg'))
-            self.trails[i] = pygame.transform.scale(self.trails[i], (self.cell_size, self.cell_size))
+        for i in range(len(self.path)):
+            elem = [int(path[i].split(' : ')[0].split(',')[0]), int(path[i].split(' : ')[0].split(',')[1]),
+                    int(path[i].split(' : ')[-1])]
+            elem[0] = elem[0] * self.cell_size + self.left
+            elem[1] = elem[1] * self.cell_size + self.top
+            self.path[i] = elem
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -153,7 +216,7 @@ class Board:
             except Exception:
                 pass
         else:
-            if command == '0':
+            if command == '0' and self.board[x_y_data[1]][x_y_data[0]] == 'G':
                 self.board[x_y_data[1]][x_y_data[0]] = 'P'
             elif self.board[x_y_data[1]][x_y_data[0]] == 'P':
                 if command == '1':
@@ -191,6 +254,19 @@ class Board:
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
 
         screen.blit(self.command_all[self.command], (self.left + (self.cell_size * (self.width - 2.5)), self.top))
+
+        for elem in self.mobs:
+            elem.draw(screen)
+
+    def update(self, FPS):
+        for i in range(len(self.mobs)):
+            self.mobs[i].update(FPS)
+            print(self.mobs[i].get_x_y())
+            print((self.path[-1][0], self.path[-1][1]))
+            if self.mobs[i].get_xp() <= 0:
+                self.mobs.pop(i)
+            elif self.mobs[i].get_x_y() == [self.path[-1][0], self.path[-1][1]]:
+                self.mobs.pop(i)
 
 
 def load_image(name, colorkey=None):

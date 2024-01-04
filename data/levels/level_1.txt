@@ -12,3 +12,12 @@ G2GG2GGGGG
 G2GG2GGGGG
 G2GG2GGGGG
 G2GG611111
+PATH:
+1,9 : 2;1,1 : 1;7,1 : 4;7,3 : 3;4,3 : 4;4,9 : 1;9,9 : 0
+COUNT WAVE 3
+1 WAVE:
+regular: 10; time: 1
+2 WAVE:
+regular: 10; time: 1
+3 WAVE:
+regular: 10; time: 1

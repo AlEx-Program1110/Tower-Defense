@@ -103,8 +103,9 @@ def play_level(level_number: int) -> None:
                 if event.key == pygame.K_UP:
                     pole.set_command('uplevel')
         screen.fill((0, 0, 0))
-        clock.tick(FPS)
+        pole.update(FPS)
         pole.render(screen)
+        clock.tick(FPS)
         pygame.display.flip()
 
 
