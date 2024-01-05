@@ -1,7 +1,7 @@
 import pygame
 from random import randint
 from mechanics import load_image, read_map
-from basic_classes import Button, Board
+from basic_classes import Button, Board, Came_over
 
 
 def main_screen_function():
@@ -66,6 +66,9 @@ def play_level(level_number: int) -> None:
     global name_of_function
     print(level_number, "E")
     pole = read_map(f'level_{level_number}.txt', (width, height))
+    game_over = Came_over(width, height)
+    status = 0
+    wait = 1
     while True:
         if name_of_function == "main_menu":
             return
@@ -102,11 +105,22 @@ def play_level(level_number: int) -> None:
                     pole.set_command('del')
                 if event.key == pygame.K_UP:
                     pole.set_command('uplevel')
+                if event.key == pygame.K_SPACE:
+                    wait = not(wait)
         screen.fill((0, 0, 0))
-        pole.update(FPS)
-        pole.render(screen)
-        clock.tick(FPS)
-        pygame.display.flip()
+        if status != 1:
+            if wait:
+                status = pole.update(FPS)
+            pole.render(screen)
+            clock.tick(FPS)
+            pygame.display.flip()
+        else:
+            screen.fill((0, 0, 0))
+            pole.render(screen)
+            game_over.update(300, FPS, width)
+            game_over.draw(screen)
+            clock.tick(FPS)
+            pygame.display.flip()
 
 
 def rules_screen() -> None:

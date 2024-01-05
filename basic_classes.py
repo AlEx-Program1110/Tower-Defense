@@ -2,13 +2,32 @@ import pygame
 from os import path
 
 
+class Came_over:
+    def __init__(self, w, h, name='gameover.png'):
+        super().__init__()
+        self.image = pygame.transform.scale(load_image(name), (w, h))
+        self.rect = self.image.get_rect()
+        self.x = -self.rect.width
+        self.rect.x = -self.rect.width
+        self.status = 1
+
+    def update(self, move, FPS, w):
+        if self.status:
+            self.x += move / FPS
+        if self.x + self.rect.width >= w:
+            self.status = 0
+        self.rect.x = self.x
+
+    def draw(self, screen):
+        screen.blit(self.image, (self.x, self.rect.y))
+
+
 class Mob(pygame.sprite.Sprite):
     def __init__(self, x=0, y=0, image='', speed=0, xp=10, path=[]):
         super().__init__()
         self.image = image
         self.x = x
         self.y = y
-        print(x, y)
         self.speed = speed
         self.xp = xp
         self.path = path[1:]
@@ -51,8 +70,11 @@ class Mob(pygame.sprite.Sprite):
                 self.direction = self.path[0][-1]
                 self.path.pop(0)
 
+    def set_speed(self, speed):
+        self.speed = speed
 
-class Tower_fire(pygame.sprite.Sprite):
+
+class Tower(pygame.sprite.Sprite):
     def __init__(self, x=0, y=0, image_all=[]):
         super().__init__()
         self.image_all = image_all.copy()
@@ -149,7 +171,8 @@ class Board:
             self.trails.append(load_image(f'trail_{i + 1}.jpg'))
             self.trails[i] = pygame.transform.scale(self.trails[i], (self.cell_size, self.cell_size))
         self.texture_mobs = {'regular': pygame.transform.scale(load_image('yes.jpg'),
-                                                               (self.cell_size, self.cell_size))}
+                                                               (self.cell_size, self.cell_size)),
+                             'fast': 1}
         self.path = path
         for i in range(len(self.path)):
             elem = [int(path[i].split(' : ')[0].split(',')[0]), int(path[i].split(' : ')[0].split(',')[1]),
@@ -173,6 +196,7 @@ class Board:
         self.tick = 0
         self.count_mobs = 0
         self.data_wave = data_wave
+        self.count_heart = 5
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -217,7 +241,7 @@ class Board:
                 self.board[x_y_data[1]][x_y_data[0]] = 'P'
             elif self.board[x_y_data[1]][x_y_data[0]] == 'P':
                 if command == '1':
-                    self.board[x_y_data[1]][x_y_data[0]] = Tower_fire(
+                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
                         x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
                         y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                         image_all=self.towers_texture['fire'])
@@ -249,9 +273,7 @@ class Board:
                     self.board[y][x].draw(screen)
         rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
-
         screen.blit(self.command_all[self.command], (self.left + (self.cell_size * (self.width - 2.5)), self.top))
-
         for elem in self.mobs:
             elem.draw(screen)
 
@@ -262,11 +284,15 @@ class Board:
             self.tick = 0
             if int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) != self.count_mobs:
                 self.mobs.append(Mob(self.path[0][0], self.path[0][1],
-                                     self.texture_mobs['regular'],
-                                     self.cell_size * 3, 10, self.path))
+                                     self.texture_mobs[self.data_wave[self.now_wave].split(': ')[0]],
+                                     self.cell_size, 10, self.path))
                 self.count_mobs += 1
+                if self.data_wave[self.now_wave].split(': ')[0] == 'regular':
+                    self.mobs[-1].set_speed(self.cell_size)
+                elif self.data_wave[self.now_wave].split(': ')[0] == 'fast':
+                    self.mobs[-1].set_speed(self.cell_size * 3)
             elif int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) == self.count_mobs:
-                if self.mobs == []:
+                if self.mobs == list():
                     self.now_wave += 1
                     if self.now_wave <= self.count_wave:
                         self.count_mobs = 0
@@ -281,6 +307,9 @@ class Board:
                     self.mobs.pop(i)
             except Exception:
                 break
+        if self.now_wave == self.count_wave:
+            print(self.now_wave)
+            return 1
 
 
 def load_image(name, colorkey=None):
