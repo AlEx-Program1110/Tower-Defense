@@ -197,6 +197,7 @@ class Board:
         self.count_mobs = 0
         self.data_wave = data_wave
         self.count_heart = 5
+        self.heart = pygame.transform.scale(load_image('heart.png'), (self.cell_size // 2, self.cell_size // 2))
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -274,6 +275,8 @@ class Board:
         rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
         screen.blit(self.command_all[self.command], (self.left + (self.cell_size * (self.width - 2.5)), self.top))
+        for i in range(self.count_heart):
+            screen.blit(self.heart, (self.left + (self.cell_size // 2 * i), self.top))
         for elem in self.mobs:
             elem.draw(screen)
 
@@ -296,8 +299,6 @@ class Board:
                     self.now_wave += 1
                     if self.now_wave <= self.count_wave:
                         self.count_mobs = 0
-                    else:
-                        self.now_wave -= 1
         for i in range(len(self.mobs)):
             try:
                 self.mobs[i].update(FPS)
@@ -305,10 +306,12 @@ class Board:
                     self.mobs.pop(i)
                 elif self.mobs[i].get_x_y() == [self.path[-1][0], self.path[-1][1]]:
                     self.mobs.pop(i)
+                    self.count_heart -= 1
             except Exception:
                 break
-        if self.now_wave == self.count_wave:
-            print(self.now_wave)
+        if self.count_heart == 0:
+            return 1
+        if self.now_wave > self.count_wave:
             return 1
 
 
