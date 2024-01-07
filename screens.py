@@ -1,7 +1,7 @@
 import pygame
 from random import randint
 from mechanics import load_image, read_map
-from basic_classes import Button, Board, Came_over
+from basic_classes import Button, Board, GameOver
 
 
 def main_screen_function():
@@ -64,11 +64,12 @@ def levels_menu_screen() -> None:
 
 def play_level(level_number: int) -> None:
     global name_of_function
-    print(level_number, "E")
+
     pole = read_map(f'level_{level_number}.txt', (width, height))
-    game_over = Came_over(width, height)
+    game_over = GameOver(width, height)
     status = 0
     wait = 1
+
     while True:
         if name_of_function == "main_menu":
             return
@@ -133,10 +134,12 @@ def rules_screen() -> None:
 
         with open('data\\files_for_game\\rules.txt', mode='r', encoding='utf-8') as file:
             intro_text = file.read().split('\n')
+
         fon = pygame.transform.scale(load_image('files_for_game\\fon.jpg'), (width, height))
         screen.blit(fon, (0, 0))
         font = pygame.font.SysFont('Comic Sans MS', 30)
         text_coord = 50
+
         for line in intro_text:
             string_rendered = font.render(line, 1, pygame.Color('black'))
             intro_rect = string_rendered.get_rect()
@@ -165,7 +168,7 @@ def exit_function() -> None:
 
 
 pygame.init()
-width, height = pygame.display.Info().current_w // 2, pygame.display.Info().current_h // 2
+width, height = pygame.display.Info().current_w, pygame.display.Info().current_h
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 FPS = 100

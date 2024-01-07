@@ -50,7 +50,7 @@ def read_map(name, size):
         if data[0].split(':')[0] != 'PATH':
             raise Exception('Файл поврежден!!!')
         data.pop(0)
-        path = data[0].split(';')
+        way = data[0].split(';')
         data.pop(0)
         if data[0].split()[0] != 'COUNT' or data[0].split()[1] != 'WAVE':
             raise Exception('Файл поврежден!!!')
@@ -66,7 +66,9 @@ def read_map(name, size):
     except Exception as text:
         print(text)
         return 0
+
     size_cell = min(size) // min(width, height)
     left = (size[0] - (width * size_cell)) // 2
     top = (size[1] - (height * size_cell)) // 2
-    return Board(width, height, left, top, size_cell, pole, path, count_wave, data_wave)
+
+    return Board(width, height, left, top, size_cell, pole, way, count_wave, data_wave)
