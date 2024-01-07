@@ -106,7 +106,7 @@ def play_level(level_number: int) -> None:
                 if event.key == pygame.K_UP:
                     pole.set_command('uplevel')
                 if event.key == pygame.K_SPACE:
-                    wait = not(wait)
+                    wait = not (wait)
         screen.fill((0, 0, 0))
         if status != 1:
             if wait:
