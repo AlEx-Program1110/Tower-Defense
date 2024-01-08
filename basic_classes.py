@@ -45,6 +45,9 @@ class Mob(pygame.sprite.Sprite):
     def set_money(self, money):
         self.money = money
 
+    def set_xp(self, xp):
+        self.xp = xp
+
     def get_money(self):
         return self.money
 
@@ -81,14 +84,13 @@ class Mob(pygame.sprite.Sprite):
 
 
 class Tower(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, image_all: list) -> None:
+    def __init__(self, x: int, y: int, image_all: list, name: str) -> None:
         super().__init__()
         self.image_all = image_all.copy()
         self.image = self.image_all[0]
         self.rect = self.image.get_rect()
-
+        self.name = name
         self.x, self.y = x, y
-        self.name = 'tower_fire'
         self.corner = 0
         self.view = 0
         self.radius = 100
@@ -195,8 +197,9 @@ class Board:
         ]
 
         self.texture_mobs = {
-            'regular': pygame.transform.scale(load_image('yes.jpg'), (self.cell_size, self.cell_size)),
-            'fast': 1
+            'regular': pygame.transform.scale(load_image('regular.jpg'), (self.cell_size, self.cell_size)),
+            'fast': pygame.transform.scale(load_image('fast.jpg'), (self.cell_size, self.cell_size)),
+            'fat': pygame.transform.scale(load_image('fat.jpg'), (self.cell_size, self.cell_size))
         }
 
         self.path = []
@@ -263,43 +266,70 @@ class Board:
         command = self.command
         if command == 'del':
             try:
-                assert not isinstance(self.board[x_y_data[1]][x_y_data[0]], Tower)
-                assert self.board[x_y_data[1]][x_y_data[0]].isdigit()
+                if isinstance(self.board[x_y_data[1]][x_y_data[0]], Tower):
+                    self.board[x_y_data[1]][x_y_data[0]] = 'P'
             except AssertionError:
-                self.board[x_y_data[1]][x_y_data[0]] = 'G'
+                pass
         elif command == 'level up':
             try:
                 assert self.board[x_y_data[1]][x_y_data[0]].name
-                assert self.board[x_y_data[1]][x_y_data[0]].view + 1 > 2
-                self.board[x_y_data[1]][x_y_data[0]].set_view(self.board[x_y_data[1]][x_y_data[0]].view + 1)
-            except AssertionError:
+                assert self.board[x_y_data[1]][x_y_data[0]].view + 1 <= 2
+                if self.board[x_y_data[1]][x_y_data[0]].name == 'fire' and self.money - (
+                        (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 20) >= 0:
+                    self.money -= (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 20
+                    self.board[x_y_data[1]][x_y_data[0]].set_view(self.board[x_y_data[1]][x_y_data[0]].view + 1)
+                elif self.board[x_y_data[1]][x_y_data[0]].name == 'bomb' and self.money - (
+                        (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 30) >= 0:
+                    self.money -= (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 30
+                    self.board[x_y_data[1]][x_y_data[0]].set_view(self.board[x_y_data[1]][x_y_data[0]].view + 1)
+                elif self.board[x_y_data[1]][x_y_data[0]].name == 'gun' and self.money - (
+                        (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 40) >= 0:
+                    self.money -= (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 40
+                    self.board[x_y_data[1]][x_y_data[0]].set_view(self.board[x_y_data[1]][x_y_data[0]].view + 1)
+                elif self.board[x_y_data[1]][x_y_data[0]].name == 'laser' and self.money - (
+                        (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 45) >= 0:
+                    self.money -= (self.board[x_y_data[1]][x_y_data[0]].view + 1) * 45
+                    self.board[x_y_data[1]][x_y_data[0]].set_view(self.board[x_y_data[1]][x_y_data[0]].view + 1)
+            except Exception:
                 pass
         else:
             if self.board[x_y_data[1]][x_y_data[0]] == 'P':
                 if command == '1':
-                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
-                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
-                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
-                        image_all=self.towers_texture['fire']
-                    )
+                    if self.money - 20 >= 0:
+                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                            x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                            y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                            image_all=self.towers_texture['fire'],
+                            name='fire'
+                        )
+                        self.money -= 20
                 elif command == '2':
-                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
-                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
-                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
-                        image_all=self.towers_texture['bomb']
-                    )
+                    if self.money - 50 >= 0:
+                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                            x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                            y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                            image_all=self.towers_texture['bomb'],
+                            name='bomb'
+                        )
+                        self.money -= 50
                 elif command == '3':
-                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
-                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
-                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
-                        image_all=self.towers_texture['gun']
-                    )
+                    if self.money - 75 >= 0:
+                        self.money -= 75
+                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                            x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                            y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                            image_all=self.towers_texture['gun'],
+                            name='gun'
+                        )
                 elif command == '4':
-                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
-                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
-                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
-                        image_all=self.towers_texture['laser']
-                    )
+                    if self.money - 150 >= 0:
+                        self.money -= 150
+                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                            x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                            y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                            image_all=self.towers_texture['laser'],
+                            name='laser'
+                        )
 
     def set_view(self, left, top, cell_size):
         self.left = left
@@ -340,6 +370,7 @@ class Board:
         self.tick += 1
         if self.tick == fps * int(self.data_wave[self.now_wave].split(': ')[-1]):
             self.tick = 0
+            self.money += 5
             if int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) != self.count_mobs:
                 self.mobs.append(
                     Mob(
@@ -357,8 +388,16 @@ class Board:
 
                 if self.data_wave[self.now_wave].split(': ')[0] == 'regular':
                     self.mobs[-1].set_speed(self.cell_size)
+                    self.mobs[-1].set_money(20)
+                    self.mobs[-1].set_xp(30)
                 elif self.data_wave[self.now_wave].split(': ')[0] == 'fast':
                     self.mobs[-1].set_speed(self.cell_size * 3)
+                    self.mobs[-1].set_money(45)
+                    self.mobs[-1].set_xp(20)
+                elif self.data_wave[self.now_wave].split(': ')[0] == 'fat':
+                    self.mobs[-1].set_speed(self.cell_size // 2)
+                    self.mobs[-1].set_money(75)
+                    self.mobs[-1].set_xp(100)
 
             elif int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) == self.count_mobs:
                 if self.mobs == list():
@@ -370,10 +409,10 @@ class Board:
             try:
                 mob.update(fps)
                 if mob.get_xp() <= 0:
+                    self.money += self.mobs[i].get_money()
                     self.mobs[i] = None
-                    self.money += 10
-                    # FIXME
                 elif mob.get_x_y() == [self.path[-1][0], self.path[-1][1]]:
+                    self.money += self.mobs[i].get_money()
                     self.mobs[i] = None
                     self.heart_count -= 1
             except IndexError:
