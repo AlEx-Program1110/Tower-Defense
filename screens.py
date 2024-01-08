@@ -82,8 +82,6 @@ def play_level(level_number: int) -> None:
             if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0]:
                 pole.get_click(pygame.mouse.get_pos())
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_0:
-                    pole.set_command('0')
                 if event.key == pygame.K_1:
                     pole.set_command('1')
                 if event.key == pygame.K_2:
@@ -92,20 +90,10 @@ def play_level(level_number: int) -> None:
                     pole.set_command('3')
                 if event.key == pygame.K_4:
                     pole.set_command('4')
-                if event.key == pygame.K_5:
-                    pole.set_command('5')
-                if event.key == pygame.K_6:
-                    pole.set_command('6')
-                if event.key == pygame.K_7:
-                    pole.set_command('7')
-                if event.key == pygame.K_8:
-                    pole.set_command('8')
-                if event.key == pygame.K_9:
-                    pole.set_command('9')
                 if event.key == pygame.K_DELETE:
                     pole.set_command('del')
                 if event.key == pygame.K_UP:
-                    pole.set_command('uplevel')
+                    pole.set_command('level up')
                 if event.key == pygame.K_SPACE:
                     wait = not (wait)
         screen.fill((0, 0, 0))

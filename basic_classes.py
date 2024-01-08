@@ -23,7 +23,7 @@ class GameOver:
 
 
 class Mob(pygame.sprite.Sprite):
-    def __init__(self, x: int, y: int, image: str | pygame.Surface, speed: int, xp: int, way: list) -> None:
+    def __init__(self, x: int, y: int, image: str | pygame.Surface, speed: int, xp: int, way: list, money: int) -> None:
         super().__init__()
         self.image = image
         self.x, self.y = x, y
@@ -31,6 +31,7 @@ class Mob(pygame.sprite.Sprite):
         self.xp = xp
         self.path = way[1:]
         self.direction = way[0][-1]
+        self.money = money
 
     def draw(self, screen: pygame.Surface) -> None:
         screen.blit(self.image, (self.x, self.y))
@@ -40,6 +41,12 @@ class Mob(pygame.sprite.Sprite):
 
     def get_x_y(self) -> list[int | float, int | float]:
         return [self.x, self.y]
+
+    def set_money(self, money):
+        self.money = money
+
+    def get_money(self):
+        return self.money
 
     def update(self, fps: int) -> int | None:
         if self.direction == 0:
@@ -164,7 +171,23 @@ class Board:
             'fire': [
                 pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
                 pygame.transform.scale(load_image('tower_fire_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
-                pygame.transform.scale(load_image('tower_fire_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))]
+                pygame.transform.scale(load_image('tower_fire_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))
+            ],
+            'bomb': [
+                pygame.transform.scale(load_image('tower_bomb_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_bomb_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_bomb_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))
+            ],
+            'gun': [
+                pygame.transform.scale(load_image('tower_gun_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_gun_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_gun_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))
+            ],
+            'laser': [
+                pygame.transform.scale(load_image('tower_laser_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_laser_2.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
+                pygame.transform.scale(load_image('tower_laser_3.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5))
+            ]
         }
 
         self.trails = [
@@ -193,16 +216,10 @@ class Board:
         self.now_wave = 1
         self.count_wave = count_wave
         self.command_all = {
-            '0': load_image('plate.jpg'),
             '1': load_image('tower_fire_1.jpg'),
-            '2': '',
-            '3': '',
-            '4': '',
-            '5': '',
-            '6': '',
-            '7': '',
-            '8': '',
-            '9': '',
+            '2': load_image('tower_bomb_1.jpg'),
+            '3': load_image('tower_gun_1.jpg'),
+            '4': load_image('tower_laser_1.jpg'),
             'del': load_image('del.jpg'),
             'level up': load_image('level up.jpg')
         }
@@ -215,7 +232,7 @@ class Board:
             self.command_all[picture_name] = pygame.transform.scale(picture, (self.cell_size // 2,) * 2)
             self.command_all[picture_name].set_colorkey((255, 255, 255))
 
-        self.command = '0'
+        self.command = '1'
         self.money = 100
         self.choice = 0
         self.pos_choice = []
@@ -224,8 +241,8 @@ class Board:
         self.data_wave = data_wave
 
         self.total_heart_count = self.heart_count = 5
-        self.alive_heart = pygame.transform.scale(load_image('alive_heart.png'), (self.cell_size // 2, ) * 2)
-        self.death_heart = pygame.transform.scale(load_image('death_heart.png'), (self.cell_size // 2, ) * 2)
+        self.alive_heart = pygame.transform.scale(load_image('alive_heart.png'), (self.cell_size // 2,) * 2)
+        self.death_heart = pygame.transform.scale(load_image('death_heart.png'), (self.cell_size // 2,) * 2)
         self.alive_heart.set_colorkey((255, 255, 255))
         self.death_heart.set_colorkey((255, 255, 255))
 
@@ -243,12 +260,6 @@ class Board:
         if x_y_data is None:
             return 0
         print(x_y_data)
-        # self.board[x_y_data[1]][x_y_data[0]] = Tower_fire(
-        #     x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
-        #     y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
-        #     image_all=self.towers_texture['fire'])
-        # настройка внешнего вида
-        # self.board[x_y_data[1]][x_y_data[0]] = 'P'
         command = self.command
         if command == 'del':
             try:
@@ -264,14 +275,31 @@ class Board:
             except AssertionError:
                 pass
         else:
-            if command == '0' and self.board[x_y_data[1]][x_y_data[0]] == 'G':
-                self.board[x_y_data[1]][x_y_data[0]] = 'P'
-            elif self.board[x_y_data[1]][x_y_data[0]] == 'P' and command == '1':
-                self.board[x_y_data[1]][x_y_data[0]] = Tower(
-                    x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
-                    y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
-                    image_all=self.towers_texture['fire']
-                )
+            if self.board[x_y_data[1]][x_y_data[0]] == 'P':
+                if command == '1':
+                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                        image_all=self.towers_texture['fire']
+                    )
+                elif command == '2':
+                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                        image_all=self.towers_texture['bomb']
+                    )
+                elif command == '3':
+                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                        image_all=self.towers_texture['gun']
+                    )
+                elif command == '4':
+                    self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
+                        y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
+                        image_all=self.towers_texture['laser']
+                    )
 
     def set_view(self, left, top, cell_size):
         self.left = left
@@ -320,7 +348,8 @@ class Board:
                         image=self.texture_mobs[self.data_wave[self.now_wave].split(': ')[0]],
                         speed=self.cell_size,
                         xp=10,
-                        way=self.path
+                        way=self.path,
+                        money=50
                     )
                 )
 
