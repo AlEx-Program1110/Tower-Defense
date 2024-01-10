@@ -169,6 +169,8 @@ class Board:
         self.grass = load_image('grass.jpg')
         self.grass = pygame.transform.scale(self.grass, (self.cell_size, self.cell_size))
         self.plate = pygame.transform.scale(load_image('plate.jpg'), (self.cell_size, self.cell_size))
+        self.box_texture = pygame.transform.scale(load_image('box.jpg'), (self.cell_size, self.cell_size))
+        self.tower_finish = pygame.transform.scale(load_image('tower_finish.jpg'), (self.cell_size, self.cell_size))
         self.towers_texture = {
             'fire': [
                 pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
@@ -197,9 +199,9 @@ class Board:
         ]
 
         self.texture_mobs = {
-            'regular': pygame.transform.scale(load_image('regular.jpg'), (self.cell_size, self.cell_size)),
-            'fast': pygame.transform.scale(load_image('fast.jpg'), (self.cell_size, self.cell_size)),
-            'fat': pygame.transform.scale(load_image('fat.jpg'), (self.cell_size, self.cell_size))
+            'regular': pygame.transform.scale(load_image('copy.jpg'), (self.cell_size, self.cell_size)),
+            'fast': pygame.transform.scale(load_image('copy.jpg'), (self.cell_size, self.cell_size)),
+            'fat': pygame.transform.scale(load_image('copy.jpg'), (self.cell_size, self.cell_size))
         }
 
         self.path = []
@@ -236,7 +238,7 @@ class Board:
             self.command_all[picture_name].set_colorkey((255, 255, 255))
 
         self.command = '1'
-        self.money = 100
+        self.money = 20
         self.choice = 0
         self.pos_choice = []
         self.tick = 0
@@ -350,6 +352,11 @@ class Board:
                     screen.blit(self.trails[int(self.board[y][x]) - 1], coordinates)
                 elif self.board[y][x] == 'P':
                     screen.blit(self.plate, coordinates)
+                elif self.board[y][x] == 'B':
+                    screen.blit(self.box_texture, coordinates)
+                elif self.board[y][x] == 'F':
+                    screen.blit(self.tower_finish, coordinates)
+
             except AssertionError:
                 screen.blit(self.plate, coordinates)
                 self.board[y][x].draw(screen)
