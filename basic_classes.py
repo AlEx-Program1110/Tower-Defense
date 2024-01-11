@@ -157,7 +157,7 @@ class Button:
 
 class Board:
     def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int, board,
-                 way: list[str], count_wave: int, data_wave: dict[int: str]) -> None:
+                 way: list[str], count_wave: int, data_wave: dict[int: str], data_tower) -> None:
 
         self.width = width
         self.height = height
@@ -171,6 +171,8 @@ class Board:
         self.plate = pygame.transform.scale(load_image('plate.jpg'), (self.cell_size, self.cell_size))
         self.box_texture = pygame.transform.scale(load_image('box.jpg'), (self.cell_size, self.cell_size))
         self.tower_finish = pygame.transform.scale(load_image('tower_finish.jpg'), (self.cell_size, self.cell_size))
+        self.data_tower = data_tower
+        # pygame.transform.scale(load_image('data_tower.bmp'), (self.cell_size * self.width, self.top))
         self.towers_texture = {
             'fire': [
                 pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
@@ -364,6 +366,7 @@ class Board:
         rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
         screen.blit(self.command_all[self.command], (self.left + (self.cell_size * (self.width - 2.5)), self.top))
+        screen.blit(self.data_tower, (self.cell_size * self.width, self.top))
 
         for i in range(self.total_heart_count):
             picture = self.alive_heart if i < self.heart_count else self.death_heart
