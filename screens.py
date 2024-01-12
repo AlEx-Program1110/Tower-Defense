@@ -100,12 +100,12 @@ def play_level(level_number: int) -> None:
         if status != 1:
             if wait:
                 status = pole.update(FPS)
-            pole.render(screen)
+            pole.render(screen, width, height)
             clock.tick(FPS)
             pygame.display.flip()
         else:
             screen.fill((0, 0, 0))
-            pole.render(screen)
+            pole.render(screen, width, height)
             game_over.update(300, FPS, width)
             game_over.draw(screen)
             clock.tick(FPS)

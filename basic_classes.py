@@ -343,7 +343,10 @@ class Board:
     def set_command(self, command):
         self.command = command
 
-    def render(self, screen):
+    def render(self, screen, w, h):
+        # for y in range(h // self.cell_size + 1):
+        #     for x in range(w // self.cell_size + 1):
+        #         screen.blit(self.grass, (x * self.cell_size, y * self.cell_size))
         for x, y in product(range(self.width), range(self.height)):
             coordinates = (x * self.cell_size + self.left, y * self.cell_size + self.top)
             try:
