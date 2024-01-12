@@ -201,9 +201,9 @@ class Board:
         ]
 
         self.texture_mobs = {
-            'regular': pygame.transform.scale(load_image('copy.jpg'), (self.cell_size, self.cell_size)),
-            'fast': pygame.transform.scale(load_image('copy.jpg'), (self.cell_size, self.cell_size)),
-            'fat': pygame.transform.scale(load_image('copy.jpg'), (self.cell_size, self.cell_size))
+            'regular': pygame.transform.scale(load_image('regular.png'), (self.cell_size, self.cell_size)),
+            'fast': pygame.transform.scale(load_image('fast.png'), (self.cell_size, self.cell_size)),
+            'fat': pygame.transform.scale(load_image('fat.png'), (self.cell_size, self.cell_size))
         }
 
         self.path = []
@@ -366,7 +366,7 @@ class Board:
         rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
         screen.blit(self.command_all[self.command], (self.left + (self.cell_size * (self.width - 2.5)), self.top))
-        screen.blit(self.data_tower, (self.cell_size * self.width, self.top))
+        # screen.blit(self.data_tower, (self.cell_size * self.width, self.top))
 
         for i in range(self.total_heart_count):
             picture = self.alive_heart if i < self.heart_count else self.death_heart
@@ -378,7 +378,7 @@ class Board:
 
     def update(self, fps: int):
         self.tick += 1
-        if self.tick == fps * int(self.data_wave[self.now_wave].split(': ')[-1]):
+        if self.tick == fps * float(self.data_wave[self.now_wave].split(': ')[-1]):
             self.tick = 0
             self.money += 5
             if int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) != self.count_mobs:
@@ -397,15 +397,15 @@ class Board:
                 self.count_mobs += 1
 
                 if self.data_wave[self.now_wave].split(': ')[0] == 'regular':
-                    self.mobs[-1].set_speed(self.cell_size)
+                    self.mobs[-1].set_speed(self.cell_size * 1.5)
                     self.mobs[-1].set_money(20)
                     self.mobs[-1].set_xp(30)
                 elif self.data_wave[self.now_wave].split(': ')[0] == 'fast':
-                    self.mobs[-1].set_speed(self.cell_size * 3)
+                    self.mobs[-1].set_speed(self.cell_size * 5)
                     self.mobs[-1].set_money(45)
                     self.mobs[-1].set_xp(20)
                 elif self.data_wave[self.now_wave].split(': ')[0] == 'fat':
-                    self.mobs[-1].set_speed(self.cell_size // 2)
+                    self.mobs[-1].set_speed(self.cell_size)
                     self.mobs[-1].set_money(75)
                     self.mobs[-1].set_xp(100)
 
@@ -418,6 +418,13 @@ class Board:
         for i, mob in enumerate(self.mobs):
             try:
                 mob.update(fps)
+                x_y = mob.get_x_y()
+                if self.board[int((x_y[1] - self.top) // self.cell_size)][
+                    int((x_y[0] - self.left) // self.cell_size)] != '1' and \
+                        self.board[int((x_y[1] - self.top) // self.cell_size)][
+                            int((x_y[0] - self.left) // self.cell_size)] != '2':
+                    print(int((x_y[1] - self.top) // self.cell_size),
+                          int((x_y[0] - self.left) // self.cell_size))
                 if mob.get_xp() <= 0:
                     self.money += self.mobs[i].get_money()
                     self.mobs[i] = None
