@@ -421,13 +421,13 @@ class Board:
         for i, mob in enumerate(self.mobs):
             try:
                 mob.update(fps)
-                x_y = mob.get_x_y()
-                if self.board[int((x_y[1] - self.top) // self.cell_size)][
-                    int((x_y[0] - self.left) // self.cell_size)] != '1' and \
-                        self.board[int((x_y[1] - self.top) // self.cell_size)][
-                            int((x_y[0] - self.left) // self.cell_size)] != '2':
-                    print(int((x_y[1] - self.top) // self.cell_size),
-                          int((x_y[0] - self.left) // self.cell_size))
+                # x_y = mob.get_x_y()
+                # if self.board[int((x_y[1] - self.top) // self.cell_size)][
+                #     int((x_y[0] - self.left) // self.cell_size)] != '1' and \
+                #         self.board[int((x_y[1] - self.top) // self.cell_size)][
+                #             int((x_y[0] - self.left) // self.cell_size)] != '2':
+                #     print(int((x_y[1] - self.top) // self.cell_size),
+                #           int((x_y[0] - self.left) // self.cell_size))
                 if mob.get_xp() <= 0:
                     self.money += self.mobs[i].get_money()
                     self.mobs[i] = None

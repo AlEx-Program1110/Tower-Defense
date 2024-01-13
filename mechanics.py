@@ -67,9 +67,8 @@ def read_map(name, size):
         print(text)
         return 0
 
-    size_cell = min(size) // min(width, height)
+    size_cell = min(size) // max(width, height)
     left = (size[0] - (width * size_cell)) // 2
     top = (size[1] - (height * size_cell)) // 2
-    data_tower = pygame.transform.scale(load_image('texture\data_tower.bmp'),
-                                        (size[0] - (width * size_cell), size[1] - (size[1] - (height * size_cell))))
-    return Board(width, height, left, top, size_cell, pole, way, count_wave, data_wave, data_tower)
+    # data_tower = load_image('texture\data_tower.bmp')
+    return Board(width, height, left, top, size_cell, pole, way, count_wave, data_wave, 1)
