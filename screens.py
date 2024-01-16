@@ -164,11 +164,11 @@ FPS = 100
 main_menu_back_ground = load_image(f"screensaver\\screensaver_{randint(1, 2)}.jpg")
 main_menu_back_ground = pygame.transform.scale(main_menu_back_ground, (width, height))
 main_menu_buttons = {
-    Button(screen, width * 0.5, height * 0.2, width * 0.3, height * 0.15, "Выживание"): "survivle_menu_screen",
     Button(screen, width * 0.5, height * 0.4, width * 0.3, height * 0.15, "Уровни"): "levels_menu_screen",
     Button(screen, width * 0.5, height * 0.6, width * 0.3, height * 0.15, "Правила"): "rule_screen",
     Button(screen, width * 0.5, height * 0.8, width * 0.3, height * 0.15, "Выход"): "exit"
 }
+# Button(screen, width * 0.5, height * 0.2, width * 0.3, height * 0.15, "Выживание"): "survivle_menu_screen",
 
 levels_menu_buttons = {
     Button(screen, width * (0.1 + n % 5 * 0.2), height * (0.3 + n // 5 * 0.4), width * 0.15, height * 0.2,
