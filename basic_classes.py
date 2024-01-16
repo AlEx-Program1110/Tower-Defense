@@ -41,17 +41,12 @@ class Mob(pygame.sprite.Sprite):
         self.direction = way[0][-1]
         self.last_direction = self.direction
         self.animation_count = 0
-        self.animation_array = [
-            [pygame.transform.scale(load_biter(name, "right", str(n)), (self.cell_size,) * 2) for n in range(16)],
-            [pygame.transform.scale(load_biter(name, "bottom", str(n)), (self.cell_size,) * 2) for n in range(16)],
-            [pygame.transform.scale(load_biter(name, "left", str(n)), (self.cell_size,) * 2) for n in range(16)],
-            [pygame.transform.scale(load_biter(name, "down", str(n)), (self.cell_size,) * 2) for n in range(16)]
-        ]
+        self.name = name
 
         self.money = money
 
     def draw(self, screen: pygame.Surface) -> None:
-        screen.blit(self.animation_array[self.direction - 1][self.animation_count], (self.x, self.y))
+        screen.blit(animation_array[self.name][self.direction - 1][self.animation_count], (self.x, self.y))
         pygame.draw.rect(
             screen,
             (255, 0, 0),
@@ -148,7 +143,6 @@ class Tower(pygame.sprite.Sprite):
         self.cooldown = 1000
 
         self.cell_size = cell_size
-
         self.bullet_picture = pygame.transform.scale(load_image("bullet.png"), (cell_size // 4, cell_size // 2))
 
     def draw(self, screen: pygame.Surface):
@@ -225,6 +219,22 @@ class Tower(pygame.sprite.Sprite):
         self.image = self.image_all[view]
 
 
+class FireTower(Tower):
+    pass
+
+
+class BombTower(Tower):
+    pass
+
+
+class GunTower(Tower):
+    pass
+
+
+class LaserTower(Tower):
+    pass
+
+
 class Button:
     def __init__(self, screen: pygame.Surface, x: float, y: float, width: float, height: float, text: str = "",
                  color: tuple[int, int, int] = (62, 50, 168), text_color: tuple[int, int, int] = (0, 0, 0),
@@ -272,6 +282,8 @@ class Button:
 class Board:
     def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int, board,
                  way: list[str], count_wave: int, data_wave: dict[int: str], data_tower) -> None:
+
+        load_biters(animation_array, cell_size)
 
         self.width = width
         self.height = height
@@ -408,7 +420,7 @@ class Board:
             if self.board[x_y_data[1]][x_y_data[0]] == 'P':
                 if command == '1':
                     if self.money - 20 >= 0:
-                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        self.board[x_y_data[1]][x_y_data[0]] = FireTower(
                             x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['fire'],
@@ -418,7 +430,7 @@ class Board:
                         self.money -= 20
                 elif command == '2':
                     if self.money - 50 >= 0:
-                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        self.board[x_y_data[1]][x_y_data[0]] = BombTower(
                             x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['bomb'],
@@ -429,7 +441,7 @@ class Board:
                 elif command == '3':
                     if self.money - 75 >= 0:
                         self.money -= 75
-                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        self.board[x_y_data[1]][x_y_data[0]] = GunTower(
                             x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['gun'],
@@ -439,7 +451,7 @@ class Board:
                 elif command == '4':
                     if self.money - 150 >= 0:
                         self.money -= 150
-                        self.board[x_y_data[1]][x_y_data[0]] = Tower(
+                        self.board[x_y_data[1]][x_y_data[0]] = LaserTower(
                             x=x_y_data[0] * self.cell_size + self.left + self.cell_size // 6,
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['laser'],
@@ -497,7 +509,6 @@ class Board:
             self.tick = 0
             self.money += 5
             if int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) != self.count_mobs:
-                # FIXME
                 self.mobs.append(
                     Mob(
                         name=self.data_wave[self.now_wave].split(': ')[0],
@@ -599,6 +610,17 @@ def load_biter(name: str, direction: str, animation: str) -> pygame.Surface:
     return image
 
 
+def load_biters(dictionary: dict, cell_size: int) -> None:
+    for name in ["fast", "fat", "regular"]:
+        dictionary[name] = [
+            [pygame.transform.scale(load_biter(name, direction, str(n)), (cell_size,) * 2) for n in range(16)]
+            for direction in ["right", "bottom", "left", "down"]
+        ]
+
+
 pygame.init()
 pygame.font.init()
 COMIC_SANS_MS = pygame.font.SysFont('Comic Sans MS', 30)
+
+cell_size = 0
+animation_array = dict()
