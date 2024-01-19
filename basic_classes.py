@@ -125,22 +125,24 @@ class Mob(pygame.sprite.Sprite):
 class Tower(pygame.sprite.Sprite):
     enemies = []
 
-    def __init__(self, x: int, y: int, image_all: list, name: str, cell_size: int) -> None:
+    def __init__(self, x: int, y: int, image_all: list, name: str, cell_size: int, left_indent: int | float,
+                 damage: int, radius: int, cooldown: int) -> None:
         super().__init__()
         self.image_all = image_all.copy()
         self.image: pygame.Surface = self.image_all[0]
         self.rect = self.image.get_rect()
+        self.left_indent = left_indent
         self.name = name
         self.x, self.y = x, y
         self.corner = 0
         self.view = 0
 
         self.angle = 0
-        self.radius = 350
-        self.damage = 10
+        self.radius = radius
+        self.damage = damage
         self.bullets = []
         self.last_shot = 0
-        self.cooldown = 1000
+        self.cooldown = cooldown
 
         self.cell_size = cell_size
         self.bullet_picture = pygame.transform.scale(load_image("bullet.png"), (cell_size // 4, cell_size // 2))
@@ -163,25 +165,18 @@ class Tower(pygame.sprite.Sprite):
                     self.last_shot = pygame.time.get_ticks()
                     self.shot(tower_center_x, tower_center_y, enemy_center_x, enemy_center_y)
 
-                    rotated_to_enemy_tower_picture = pygame.transform.rotate(self.image, self.angle)
-                    screen.blit(
-                        rotated_to_enemy_tower_picture,
-                        rotated_to_enemy_tower_picture.get_rect(center=center_tower_coordinates)
-                    )
-                    break
-        else:
-            rotated_to_enemy_tower_picture = pygame.transform.rotate(self.image, self.angle)
-            center_coordinates = self.x + self.image.get_width() // 2, self.y + self.image.get_height() // 2
-            screen.blit(
-                rotated_to_enemy_tower_picture,
-                rotated_to_enemy_tower_picture.get_rect(center=center_coordinates)
-            )
+                break
 
-        self.update_bullets(screen)
+        rotated_to_enemy_tower_picture = pygame.transform.rotate(self.image, self.angle)
+        center_coordinates = self.x + self.image.get_width() // 2, self.y + self.image.get_height() // 2
+        screen.blit(
+            rotated_to_enemy_tower_picture,
+            rotated_to_enemy_tower_picture.get_rect(center=center_coordinates)
+        )
 
     def shot(self, tower_center_x: int, tower_center_y: int, enemy_center_x: int, enemy_center_y: int) -> None:
         self.bullets.append(
-            [tower_center_x, tower_center_y, enemy_center_x, enemy_center_y, self.angle, 0, 120, 12]
+            [tower_center_x, tower_center_y, enemy_center_x, enemy_center_y, self.angle, 0, 120, 3]
         )
 
     def update_bullets(self, screen: pygame.Surface) -> None:
@@ -192,19 +187,26 @@ class Tower(pygame.sprite.Sprite):
                 self.bullets[index] = None
                 continue
 
-            for enemy in self.enemies:
-                center_coordinates = enemy.x + enemy.image.get_width() // 2, enemy.y + enemy.image.get_height() // 2
-                center_x = bullet[0] + (bullet[2] - bullet[0]) * (bullet[-3] / bullet[-2])
-                center_y = bullet[1] + (bullet[3] - bullet[1]) * (bullet[-3] / bullet[-2])
+            center_x = bullet[0] + (bullet[2] - bullet[0]) * (bullet[-3] / bullet[-2])
+            center_y = bullet[1] + (bullet[3] - bullet[1]) * (bullet[-3] / bullet[-2])
 
-                rotated_bullet = pygame.transform.rotate(self.bullet_picture, bullet[-4])
-                bullet_rect = rotated_bullet.get_rect(center=(center_x, center_y))
+            rotated_bullet = pygame.transform.rotate(self.bullet_picture, bullet[-4])
+            bullet_rect = rotated_bullet.get_rect(center=(center_x, center_y))
 
-                if bullet_rect.colliderect(enemy.image.get_rect(center=center_coordinates)):
+            for box_y, box_x in boxes:
+                if (box_x * self.cell_size <= center_x - self.left_indent <= (box_x + 1) * self.cell_size and
+                        box_y * self.cell_size <= center_y <= (box_y + 1) * self.cell_size):
                     self.bullets[index] = None
-                    enemy.xp -= self.damage
-                else:
-                    screen.blit(rotated_bullet, bullet_rect)
+                    break
+            else:
+                for enemy in self.enemies:
+                    center_coordinates = enemy.x + enemy.image.get_width() // 2, enemy.y + enemy.image.get_height() // 2
+
+                    if bullet_rect.colliderect(enemy.image.get_rect(center=center_coordinates)):
+                        self.bullets[index] = None
+                        enemy.xp -= self.damage
+                    else:
+                        screen.blit(rotated_bullet, bullet_rect)
 
         self.bullets = list(filter(lambda x: x is not None, self.bullets))
 
@@ -220,19 +222,31 @@ class Tower(pygame.sprite.Sprite):
 
 
 class FireTower(Tower):
-    pass
+    def __init__(self, x: int, y: int, image_all: list, name: str, cell_size: int, left_indent: int | float,
+                 damage: int, radius: int, cooldown: int) -> None:
+        super().__init__(x, y, image_all, name, cell_size, left_indent, damage, radius, cooldown)
+        self.bullet_picture = pygame.transform.scale(load_image("patron_fire.jpg"), (cell_size // 4, cell_size // 4))
 
 
 class BombTower(Tower):
-    pass
+    def __init__(self, x: int, y: int, image_all: list, name: str, cell_size: int, left_indent: int | float,
+                 damage: int, radius: int, cooldown: int) -> None:
+        super().__init__(x, y, image_all, name, cell_size, left_indent, damage, radius, cooldown)
+        self.bullet_picture = pygame.transform.scale(load_image("patron_bomb.jpg"), (cell_size // 4, cell_size // 4))
 
 
 class GunTower(Tower):
-    pass
+    def __init__(self, x: int, y: int, image_all: list, name: str, cell_size: int, left_indent: int | float,
+                 damage: int, radius: int, cooldown: int) -> None:
+        super().__init__(x, y, image_all, name, cell_size, left_indent, damage, radius, cooldown)
+        self.bullet_picture = pygame.transform.scale(load_image("patron_gun.jpg"), (cell_size // 4, cell_size // 4))
 
 
 class LaserTower(Tower):
-    pass
+    def __init__(self, x: int, y: int, image_all: list, name: str, cell_size: int, left_indent: int | float,
+                 damage: int, radius: int, cooldown: int) -> None:
+        super().__init__(x, y, image_all, name, cell_size, left_indent, damage, radius, cooldown)
+        self.bullet_picture = pygame.transform.scale(load_image("patron_laser.jpg"), (cell_size // 4, cell_size // 4))
 
 
 class Button:
@@ -282,8 +296,6 @@ class Button:
 class Board:
     def __init__(self, width: int, height: int, left_indent: int, top_indent: int, cell_size: int, board,
                  way: list[str], count_wave: int, data_wave: dict[int: str], data_tower) -> None:
-
-        load_biters(animation_array, cell_size)
 
         self.width = width
         self.height = height
@@ -425,7 +437,11 @@ class Board:
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['fire'],
                             name='fire',
-                            cell_size=self.cell_size
+                            cell_size=self.cell_size,
+                            left_indent=self.left,
+                            damage=10,
+                            radius=150,
+                            cooldown=1000
                         )
                         self.money -= 20
                 elif command == '2':
@@ -435,7 +451,11 @@ class Board:
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['bomb'],
                             name='bomb',
-                            cell_size=self.cell_size
+                            cell_size=self.cell_size,
+                            left_indent=self.left,
+                            damage=40,
+                            radius=150,
+                            cooldown=3000
                         )
                         self.money -= 50
                 elif command == '3':
@@ -446,7 +466,11 @@ class Board:
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['gun'],
                             name='gun',
-                            cell_size=self.cell_size
+                            cell_size=self.cell_size,
+                            left_indent=self.left,
+                            damage=1,
+                            radius=300,
+                            cooldown=100
                         )
                 elif command == '4':
                     if self.money - 150 >= 0:
@@ -456,7 +480,11 @@ class Board:
                             y=x_y_data[1] * self.cell_size + self.top + self.cell_size // 6,
                             image_all=self.towers_texture['laser'],
                             name='laser',
-                            cell_size=self.cell_size
+                            cell_size=self.cell_size,
+                            left_indent=self.left,
+                            damage=20,
+                            radius=200,
+                            cooldown=1000
                         )
 
     def set_view(self, left, top, cell_size):
@@ -471,6 +499,8 @@ class Board:
         # for y in range(h // self.cell_size + 1):
         #     for x in range(w // self.cell_size + 1):
         #         screen.blit(self.grass, (x * self.cell_size, y * self.cell_size))
+        towers = []
+
         for x, y in product(range(self.width), range(self.height)):
             coordinates = (x * self.cell_size + self.left, y * self.cell_size + self.top)
             try:
@@ -487,8 +517,12 @@ class Board:
                     screen.blit(self.tower_finish, coordinates)
 
             except AssertionError:
+                towers.append(self.board[y][x])
                 screen.blit(self.plate, coordinates)
                 self.board[y][x].draw(screen)
+
+        for tower in towers:
+            tower.update_bullets(screen)
 
         rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
@@ -610,9 +644,9 @@ def load_biter(name: str, direction: str, animation: str) -> pygame.Surface:
     return image
 
 
-def load_biters(dictionary: dict, cell_size: int) -> None:
+def load_biters(cell_size: int) -> None:
     for name in ["fast", "fat", "regular"]:
-        dictionary[name] = [
+        animation_array[name] = [
             [pygame.transform.scale(load_biter(name, direction, str(n)), (cell_size,) * 2) for n in range(16)]
             for direction in ["right", "bottom", "left", "down"]
         ]
@@ -624,3 +658,4 @@ COMIC_SANS_MS = pygame.font.SysFont('Comic Sans MS', 30)
 
 cell_size = 0
 animation_array = dict()
+boxes = []

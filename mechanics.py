@@ -1,6 +1,6 @@
 import pygame
 from os import path
-from basic_classes import Board
+from basic_classes import Board, load_biters, boxes
 
 PASSWORD = 'program.08'
 
@@ -70,5 +70,7 @@ def read_map(name, size):
     size_cell = min(size) // max(width, height)
     left = (size[0] - (width * size_cell)) // 2
     top = (size[1] - (height * size_cell)) // 2
-    # data_tower = load_image('texture\data_tower.bmp')
+
+    boxes[:] = [(i, j) for i, line in enumerate(pole) for j, elem in enumerate(line) if elem == 'B']
+    load_biters(size_cell)
     return Board(width, height, left, top, size_cell, pole, way, count_wave, data_wave, 1)
