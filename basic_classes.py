@@ -562,16 +562,16 @@ class Board:
 
                 if self.data_wave[self.now_wave].split(': ')[0] == 'regular':
                     self.mobs[-1].set_speed(self.cell_size * 1.5)
-                    self.mobs[-1].set_money(20)
-                    self.mobs[-1].set_xp(30)
+                    self.mobs[-1].set_money(15)
+                    self.mobs[-1].set_xp(75)
                 elif self.data_wave[self.now_wave].split(': ')[0] == 'fast':
                     self.mobs[-1].set_speed(self.cell_size * 5)
-                    self.mobs[-1].set_money(45)
-                    self.mobs[-1].set_xp(20)
+                    self.mobs[-1].set_money(30)
+                    self.mobs[-1].set_xp(50)
                 elif self.data_wave[self.now_wave].split(': ')[0] == 'fat':
                     self.mobs[-1].set_speed(self.cell_size)
-                    self.mobs[-1].set_money(75)
-                    self.mobs[-1].set_xp(100)
+                    self.mobs[-1].set_money(60)
+                    self.mobs[-1].set_xp(200)
 
             elif int(self.data_wave[self.now_wave].split(': ')[1].split(';')[0]) == self.count_mobs:
                 if self.mobs == list():
