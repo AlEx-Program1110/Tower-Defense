@@ -613,7 +613,7 @@ class Board:
         Tower.enemies = self.mobs
         if self.heart_count == 0:
             return 1
-        if self.now_wave >= self.count_wave:
+        if self.now_wave > self.count_wave:
             return 2
 
 
