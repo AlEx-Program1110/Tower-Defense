@@ -75,7 +75,7 @@ def play_level(level_number: int) -> None:
             return
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                name_of_function = "main_menu"
+                name_of_function = "levels_menu_screen"
                 return
             if event.type == pygame.QUIT:
                 exit_function()
@@ -123,8 +123,8 @@ def rules_screen() -> None:
 
         fon = pygame.transform.scale(load_image('files_for_game\\fon.jpg'), (width, height))
         screen.blit(fon, (0, 0))
-        font = pygame.font.SysFont('Comic Sans MS', 30)
-        text_coord = 50
+        font = pygame.font.SysFont('Comic Sans MS', 22)
+        text_coord = 0
 
         for line in intro_text:
             string_rendered = font.render(line, 1, pygame.Color('black'))

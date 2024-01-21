@@ -155,8 +155,6 @@ class Tower(pygame.sprite.Sprite):
             center_coordinates = enemy.x + enemy.image.get_width() // 2, enemy.y + enemy.image.get_height() // 2
             enemy_center_x, enemy_center_y = center_coordinates
 
-            pygame.draw.line(screen, (255, 0, 0), center_tower_coordinates, center_coordinates)
-
             distance = pow((tower_center_x - enemy_center_x) ** 2 + (tower_center_y - enemy_center_y) ** 2, 0.5)
             if distance <= self.radius:
                 self.angle = -atan2(enemy_center_y - tower_center_y, enemy_center_x - tower_center_x) * (180 / pi) - 90
@@ -212,7 +210,7 @@ class Tower(pygame.sprite.Sprite):
 
     def set_corner(self, corner) -> None:
         self.corner = corner
-        loc = self.image.get_rect().center  # rot_image is not defined
+        loc = self.image.get_rect().center
         self.image = pygame.transform.rotate(self.image, corner)
         self.image.get_rect().center = loc
 
@@ -310,7 +308,7 @@ class Board:
         self.box_texture = pygame.transform.scale(load_image('box.jpg'), (self.cell_size, self.cell_size))
         self.tower_finish = pygame.transform.scale(load_image('tower_finish.jpg'), (self.cell_size, self.cell_size))
         self.data_tower = data_tower
-        # pygame.transform.scale(load_image('data_tower.bmp'), (self.cell_size * self.width, self.top))
+
         self.towers_texture = {
             'fire': [
                 pygame.transform.scale(load_image('tower_fire_1.jpg'), (self.cell_size // 1.5, self.cell_size // 1.5)),
@@ -496,9 +494,6 @@ class Board:
         self.command = command
 
     def render(self, screen, w, h):
-        # for y in range(h // self.cell_size + 1):
-        #     for x in range(w // self.cell_size + 1):
-        #         screen.blit(self.grass, (x * self.cell_size, y * self.cell_size))
         towers = []
 
         for x, y in product(range(self.width), range(self.height)):
@@ -524,10 +519,9 @@ class Board:
         for tower in towers:
             tower.update_bullets(screen)
 
-        rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'red')
+        rendered_text = COMIC_SANS_MS.render(str(self.money) + '$', False, 'black')
         screen.blit(rendered_text, (self.left + (self.cell_size * (self.width - 2)), self.top))
         screen.blit(self.command_all[self.command], (self.left + (self.cell_size * (self.width - 2.5)), self.top))
-        # screen.blit(self.data_tower, (self.cell_size * self.width, self.top))
 
         for i in range(self.total_heart_count):
             picture = self.alive_heart if i < self.heart_count else self.death_heart
@@ -582,13 +576,6 @@ class Board:
         for i, mob in enumerate(self.mobs):
             try:
                 mob.update(fps)
-                # x_y = mob.get_x_y()
-                # if self.board[int((x_y[1] - self.top) // self.cell_size)][
-                #     int((x_y[0] - self.left) // self.cell_size)] != '1' and \
-                #         self.board[int((x_y[1] - self.top) // self.cell_size)][
-                #             int((x_y[0] - self.left) // self.cell_size)] != '2':
-                #     print(int((x_y[1] - self.top) // self.cell_size),
-                #           int((x_y[0] - self.left) // self.cell_size))
                 if mob.get_xp() <= 0:
                     self.money += self.mobs[i].get_money()
                     self.mobs[i] = None
