@@ -23,6 +23,24 @@ class GameOver:
     def draw(self, screen: pygame.Surface) -> None:
         screen.blit(self.image, (self.x, self.rect.y))
 
+class GameOverWin:
+    def __init__(self, screen_width: int, screen_height: int, name: str = "you win.png") -> None:
+        self.image = pygame.transform.scale(load_image(name), (screen_width, screen_height))
+        self.rect = self.image.get_rect()
+        self.x = -self.rect.width
+        self.rect.x = -self.rect.width
+        self.status = 1
+
+    def update(self, move: int, fps: int, screen_width: int) -> None:
+        if self.status:
+            self.x += move / fps
+        if self.x + self.rect.width >= screen_width:
+            self.status = 0
+        self.rect.x = self.x
+
+    def draw(self, screen: pygame.Surface) -> None:
+        screen.blit(self.image, (self.x, self.rect.y))
+
 
 class Mob(pygame.sprite.Sprite):
     def __init__(self, name: str, x: int, y: int, speed: int, xp: int, way: list,
@@ -533,6 +551,11 @@ class Board:
 
     def update(self, fps: int):
         self.tick += 1
+        print(self.now_wave)
+        try:
+            self.tick == fps * float(self.data_wave[self.now_wave].split(': ')[-1])
+        except Exception:
+            return 2
         if self.tick == fps * float(self.data_wave[self.now_wave].split(': ')[-1]):
             self.tick = 0
             self.money += 5
@@ -588,8 +611,10 @@ class Board:
 
         self.mobs = list(filter(lambda enemy: enemy is not None, self.mobs))
         Tower.enemies = self.mobs
-        if self.heart_count == 0 or self.now_wave > self.count_wave:
+        if self.heart_count == 0:
             return 1
+        if self.now_wave >= self.count_wave:
+            return 2
 
 
 def load_image(name: str, color_key: str = None):
